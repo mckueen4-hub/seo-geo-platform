@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import type { StoreItem } from '../types';
-import { X, Image as ImageIcon, CheckCircle2, Edit3 } from 'lucide-react';
+import { X, Image as ImageIcon, Edit3, Link, Save } from 'lucide-react';
 
 interface AltTagEditorModalProps {
   isOpen: boolean;
   onClose: () => void;
   store: StoreItem;
-  onUpdateImageAlt: (imageId: string, newAlt: string) => void;
+  onUpdateImageAlt: (imageId: string, newAlt: string, newUrl?: string) => void;
 }
 
 export const AltTagEditorModal: React.FC<AltTagEditorModalProps> = ({
@@ -16,25 +16,30 @@ export const AltTagEditorModal: React.FC<AltTagEditorModalProps> = ({
   onUpdateImageAlt
 }) => {
   const [editingImageId, setEditingImageId] = useState<string | null>(null);
+  
   const [altTextMap, setAltTextMap] = useState<Record<string, string>>(() => {
     const map: Record<string, string> = {};
-    store.scrapedImages.forEach(img => {
+    store?.scrapedImages?.forEach(img => {
       map[img.id] = img.aiAltTag;
     });
     return map;
   });
-  const [savedNotice, setSavedNotice] = useState<string | null>(null);
 
-  if (!isOpen) return null;
+  const [urlTextMap, setUrlTextMap] = useState<Record<string, string>>(() => {
+    const map: Record<string, string> = {};
+    store?.scrapedImages?.forEach(img => {
+      map[img.id] = img.url;
+    });
+    return map;
+  });
 
-  const handleSaveSingleAlt = (imgId: string) => {
+  if (!isOpen || !store) return null;
+
+  const handleSave = (imgId: string) => {
     const newAlt = altTextMap[imgId];
-    if (newAlt) {
-      onUpdateImageAlt(imgId, newAlt);
-      setEditingImageId(null);
-      setSavedNotice(`已更新圖片 SEO Alt Tag！已同步至「${store.name}」專屬子網站。`);
-      setTimeout(() => setSavedNotice(null), 2500);
-    }
+    const newUrl = urlTextMap[imgId];
+    onUpdateImageAlt(imgId, newAlt, newUrl);
+    setEditingImageId(null);
   };
 
   return (
@@ -44,7 +49,7 @@ export const AltTagEditorModal: React.FC<AltTagEditorModalProps> = ({
       left: 0,
       right: 0,
       bottom: 0,
-      background: 'rgba(0, 0, 0, 0.75)',
+      background: 'rgba(0, 0, 0, 0.8)',
       backdropFilter: 'blur(8px)',
       display: 'flex',
       alignItems: 'center',
@@ -52,9 +57,8 @@ export const AltTagEditorModal: React.FC<AltTagEditorModalProps> = ({
       zIndex: 999,
       padding: '20px'
     }}>
-      <div className="glass-panel animate-fade-in" style={{ width: '100%', maxWidth: '800px', padding: '28px', position: 'relative', maxHeight: '90vh', overflowY: 'auto' }}>
+      <div className="glass-panel animate-fade-in" style={{ width: '100%', maxWidth: '800px', maxHeight: '85vh', display: 'flex', flexDirection: 'column', padding: '24px', position: 'relative' }}>
         
-        {/* Close Button */}
         <button
           onClick={onClose}
           style={{
@@ -70,148 +74,136 @@ export const AltTagEditorModal: React.FC<AltTagEditorModalProps> = ({
           <X size={20} />
         </button>
 
-        <h2 style={{ fontSize: '20px', fontWeight: '800', color: '#f3f4f6', margin: '0 0 6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <ImageIcon size={22} color="#fbbf24" />
-          OpenRice / Blogger 素材圖片 AI Alt-Tag 手動/AI 校正器
+        <h2 style={{ fontSize: '18px', fontWeight: '800', color: '#f3f4f6', margin: '0 0 6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <ImageIcon size={20} color="#34d399" />
+          【{store.name}】真實餐廳相片與 AI Alt 標籤管理
         </h2>
-        <p style={{ fontSize: '13px', color: '#9ca3af', marginBottom: '20px' }}>
-          「{store.name}」素材庫已擷取 {store.scrapedImages.length} 張圖片。管理員可微調 AI Vision 自動產生之關鍵字 Alt 標籤。
+        <p style={{ fontSize: '12px', color: '#9ca3af', marginBottom: '18px' }}>
+          您可以自由替換餐廳真實照片網址 (Photo URL) 或微調 AI Alt 描述，點擊「儲存」即時同步至線上！
         </p>
 
-        {savedNotice && (
-          <div style={{
-            padding: '12px 16px',
-            background: 'rgba(16, 185, 129, 0.15)',
-            border: '1px solid rgba(16, 185, 129, 0.4)',
-            borderRadius: '8px',
-            color: '#34d399',
-            fontSize: '13px',
-            fontWeight: '600',
-            marginBottom: '16px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
-          }}>
-            <CheckCircle2 size={16} />
-            {savedNotice}
-          </div>
-        )}
-
-        {/* Images List Grid */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {store.scrapedImages.map((img) => (
-            <div key={img.id} style={{
-              display: 'flex',
-              gap: '16px',
-              background: '#111827',
-              padding: '16px',
-              borderRadius: '12px',
-              border: '1px solid #374151',
-              alignItems: 'center',
-              flexWrap: 'wrap'
-            }}>
-              
-              <img 
-                src={img.url} 
-                alt={img.aiAltTag} 
-                style={{ width: '100px', height: '80px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #374151' }} 
-              />
-
-              <div style={{ flex: 1, minWidth: '240px' }}>
-                <div style={{ fontSize: '14px', fontWeight: '700', color: '#f3f4f6', marginBottom: '4px' }}>
-                  {img.caption}
+        {/* Scrollable list */}
+        <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px', paddingRight: '6px' }}>
+          {store.scrapedImages?.map((img) => {
+            const isEditing = editingImageId === img.id;
+            return (
+              <div key={img.id} style={{ background: '#111827', padding: '16px', borderRadius: '12px', border: '1px solid #374151', display: 'flex', gap: '16px', alignItems: 'center' }}>
+                
+                {/* Photo Preview Thumbnail */}
+                <div style={{ width: '140px', height: '100px', borderRadius: '8px', overflow: 'hidden', flexShrink: 0, border: '1px solid #1f293d', background: '#000' }}>
+                  <img src={urlTextMap[img.id] || img.url} alt={img.caption} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
 
-                <div style={{ fontSize: '11px', color: '#9ca3af', marginBottom: '8px' }}>
-                  分類標籤：<span style={{ color: '#60a5fa', fontWeight: '600' }}>{img.category === 'dish' ? '🍱 招牌菜色' : '🌆 餐廳環境'}</span>
+                {/* Content Details */}
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{ fontSize: '13px', fontWeight: '700', color: '#f3f4f6' }}>
+                    📸 相片標題: {img.caption}
+                  </div>
+
+                  {isEditing ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      
+                      <div>
+                        <label style={{ fontSize: '11px', color: '#60a5fa', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <Link size={12} /> 相片真實網址 (Photo URL):
+                        </label>
+                        <input
+                          type="text"
+                          value={urlTextMap[img.id] || ''}
+                          onChange={(e) => setUrlTextMap({ ...urlTextMap, [img.id]: e.target.value })}
+                          placeholder="https://..."
+                          style={{ width: '100%', padding: '6px 10px', borderRadius: '6px', background: '#0b0f19', border: '1px solid #3b82f6', color: '#60a5fa', fontSize: '12px', outline: 'none' }}
+                        />
+                      </div>
+
+                      <div>
+                        <label style={{ fontSize: '11px', color: '#34d399', fontWeight: '600' }}>
+                          🏷️ AI Vision Alt 標籤:
+                        </label>
+                        <input
+                          type="text"
+                          value={altTextMap[img.id] || ''}
+                          onChange={(e) => setAltTextMap({ ...altTextMap, [img.id]: e.target.value })}
+                          style={{ width: '100%', padding: '6px 10px', borderRadius: '6px', background: '#0b0f19', border: '1px solid #10b981', color: '#f3f4f6', fontSize: '12px', outline: 'none' }}
+                        />
+                      </div>
+
+                      <button
+                        onClick={() => handleSave(img.id)}
+                        style={{
+                          alignSelf: 'flex-start',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          background: '#10b981',
+                          color: '#fff',
+                          border: 'none',
+                          padding: '6px 14px',
+                          borderRadius: '6px',
+                          fontSize: '12px',
+                          fontWeight: '700',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <Save size={12} /> 儲存修改
+                      </button>
+
+                    </div>
+                  ) : (
+                    <>
+                      <div style={{ fontSize: '12px', color: '#34d399', background: 'rgba(52, 211, 153, 0.1)', padding: '6px 10px', borderRadius: '6px', border: '1px solid rgba(52, 211, 153, 0.2)' }}>
+                        🏷️ AI Alt: {altTextMap[img.id] || img.aiAltTag}
+                      </div>
+
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
+                        <span style={{ fontSize: '11px', color: '#6b7280', fontFamily: 'var(--font-mono)' }}>
+                          {urlTextMap[img.id]?.substring(0, 50)}...
+                        </span>
+
+                        <button
+                          onClick={() => setEditingImageId(img.id)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            background: '#1f293d',
+                            color: '#60a5fa',
+                            border: '1px solid #374151',
+                            padding: '4px 10px',
+                            borderRadius: '6px',
+                            fontSize: '11px',
+                            fontWeight: '600',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <Edit3 size={12} /> 替換相片 / 修改 Alt
+                        </button>
+                      </div>
+                    </>
+                  )}
+
                 </div>
 
-                {editingImageId === img.id ? (
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <input
-                      type="text"
-                      value={altTextMap[img.id] || ''}
-                      onChange={(e) => setAltTextMap({ ...altTextMap, [img.id]: e.target.value })}
-                      style={{
-                        flex: 1,
-                        padding: '6px 10px',
-                        borderRadius: '6px',
-                        background: '#1f293d',
-                        border: '1px solid #60a5fa',
-                        color: '#34d399',
-                        fontSize: '12px',
-                        fontFamily: 'var(--font-mono)'
-                      }}
-                    />
-                    <button
-                      onClick={() => handleSaveSingleAlt(img.id)}
-                      style={{
-                        padding: '6px 12px',
-                        background: '#10b981',
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: '6px',
-                        fontSize: '12px',
-                        fontWeight: '700',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      儲存
-                    </button>
-                  </div>
-                ) : (
-                  <div style={{
-                    fontSize: '12px',
-                    color: '#34d399',
-                    fontFamily: 'var(--font-mono)',
-                    background: 'rgba(16, 185, 129, 0.1)',
-                    padding: '6px 10px',
-                    borderRadius: '6px',
-                    border: '1px solid rgba(16, 185, 129, 0.3)',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                  }}>
-                    <span>Alt Tag: {img.aiAltTag}</span>
-                    <button
-                      onClick={() => setEditingImageId(img.id)}
-                      style={{
-                        background: 'transparent',
-                        border: 'none',
-                        color: '#60a5fa',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                        fontSize: '11px',
-                        fontWeight: '600'
-                      }}
-                    >
-                      <Edit3 size={12} /> 編輯
-                    </button>
-                  </div>
-                )}
               </div>
-
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div style={{ marginTop: '20px', textAlign: 'right' }}>
           <button
             onClick={onClose}
             style={{
-              padding: '10px 20px',
-              background: '#1f293d',
-              color: '#f3f4f6',
-              border: '1px solid #374151',
-              borderRadius: '8px',
+              padding: '8px 18px',
+              background: '#374151',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '6px',
               fontSize: '13px',
               fontWeight: '600',
               cursor: 'pointer'
             }}
           >
-            關閉
+            完成閉合
           </button>
         </div>
 

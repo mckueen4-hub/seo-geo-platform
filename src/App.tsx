@@ -26,7 +26,6 @@ export function App() {
   const [isPromptModalOpen, setIsPromptModalOpen] = useState<boolean>(false);
   const [isAltTagModalOpen, setIsAltTagModalOpen] = useState<boolean>(false);
 
-  // 當使用者造訪泛子網域 (例如 library-restaurant-and-bar.studioconcierge.xyz) 時，自動辨識並進入專屬子頁面
   useEffect(() => {
     const hostname = window.location.hostname;
     if (hostname.includes('.studioconcierge.xyz') && !hostname.startsWith('www.')) {
@@ -96,12 +95,16 @@ export function App() {
     setToneRules(updatedRules);
   };
 
-  const handleUpdateAltTag = (imageId: string, newAltTag: string) => {
+  const handleUpdateAltTag = (imageId: string, newAltTag: string, newUrl?: string) => {
     setStores(prev => prev.map(s => {
-      if (s.id === selectedStoreId) {
+      if (s.id === selectedAltStore.id || s.id === selectedStoreId) {
         return {
           ...s,
-          scrapedImages: s.scrapedImages.map(img => img.id === imageId ? { ...img, aiAltTag: newAltTag } : img)
+          scrapedImages: s.scrapedImages.map(img => img.id === imageId ? { 
+            ...img, 
+            aiAltTag: newAltTag,
+            url: newUrl || img.url
+          } : img)
         };
       }
       return s;
@@ -172,7 +175,7 @@ export function App() {
       <AltTagEditorModal
         isOpen={isAltTagModalOpen}
         onClose={() => setIsAltTagModalOpen(false)}
-        store={selectedAltStore}
+        store={selectedAltStore || stores[0]}
         onUpdateImageAlt={handleUpdateAltTag}
       />
 

@@ -20,22 +20,23 @@ app.use(express.json());
 
 const DATA_FILE = path.join(__dirname, 'stores_db.json');
 
-const WESTERN_BAR_IMAGES = [
+// 高清寫實西餐酒吧專屬相片庫 (精緻雞尾酒、圖書館風酒吧、炭烤牛排、夜景)
+const REAL_WESTERN_BAR_IMAGES = [
   {
-    url: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=800&q=80',
-    caption: '招牌特調手工雞尾酒 Signature Cocktail'
+    url: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=800&q=80',
+    caption: '招牌煙燻特調雞尾酒 (Signature Cocktail)'
   },
   {
-    url: 'https://images.unsplash.com/photo-1572116469696-31de0f17cc34?auto=format&fit=crop&w=800&q=80',
-    caption: '英倫圖書館風格奢華酒吧環境'
+    url: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80',
+    caption: '圖書館英倫奢華酒吧環境 (Library Lounge Interior)'
   },
   {
     url: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80',
-    caption: '熟成安格斯炭烤肋眼牛排'
+    caption: '熟成安格斯炭烤肋眼牛排 (Ribeye Steak)'
   },
   {
-    url: 'https://images.unsplash.com/photo-1538488881024-42461043ce69?auto=format&fit=crop&w=800&q=80',
-    caption: '尖沙咀夜景露天酒吧卡位'
+    url: 'https://images.unsplash.com/photo-1570560258879-af7f8e1447ac?auto=format&fit=crop&w=800&q=80',
+    caption: '露天夜景微醺調酒卡位 (Rooftop Lounge View)'
   }
 ];
 
@@ -87,7 +88,7 @@ const DEFAULT_INITIAL_STORES = [
     articleCount: 16,
     lastUpdated: '今日 10:20 AM',
     articles: [],
-    scrapedImages: WESTERN_BAR_IMAGES.map((img, i) => ({
+    scrapedImages: REAL_WESTERN_BAR_IMAGES.map((img, i) => ({
       id: `img-w-${i}`,
       url: img.url,
       caption: img.caption,
@@ -196,13 +197,29 @@ app.post('/api/scrape', async (req, res) => {
       cuisine = '西餐酒吧 / 精緻調酒';
     }
 
-    const images = WESTERN_BAR_IMAGES.map((img, i) => ({
-      id: `img-western-${Date.now()}-${i}`,
-      url: img.url,
-      caption: img.caption,
-      aiAltTag: `${district} ${cleanTitle} ${img.caption}`,
-      category: i % 2 === 0 ? 'dish' : 'env'
-    }));
+    const scrapedOpenricePhotos = [];
+    $('img').each((_, el) => {
+      const src = $(el).attr('src') || $(el).attr('data-src');
+      if (src && (src.includes('photo') || src.includes('restaurant') || src.includes('big')) && !src.includes('logo') && !src.includes('icon')) {
+        scrapedOpenricePhotos.push(src);
+      }
+    });
+
+    const finalPhotos = scrapedOpenricePhotos.length >= 2 
+      ? scrapedOpenricePhotos.slice(0, 4).map((src, i) => ({
+          id: `img-or-${Date.now()}-${i}`,
+          url: src,
+          caption: i === 0 ? '招牌精緻菜色' : '店內奢華用餐環境',
+          aiAltTag: `${district} ${cleanTitle} 招牌美食照片`,
+          category: i % 2 === 0 ? 'dish' : 'env'
+        }))
+      : REAL_WESTERN_BAR_IMAGES.map((img, i) => ({
+          id: `img-western-${Date.now()}-${i}`,
+          url: img.url,
+          caption: img.caption,
+          aiAltTag: `${district} ${cleanTitle} ${img.caption}`,
+          category: i % 2 === 0 ? 'dish' : 'env'
+        }));
 
     return res.json({
       success: true,
@@ -212,7 +229,7 @@ app.post('/api/scrape', async (req, res) => {
         cuisine,
         openriceUrl: url,
         metaDesc: '食材每日新鮮直送，提供質感氛圍與精緻餐酒搭配。',
-        images
+        images: finalPhotos
       }
     });
 
@@ -220,7 +237,7 @@ app.post('/api/scrape', async (req, res) => {
     const cleanTitle = cleanRestaurantName(fallbackInfo.title);
     const district = fallbackInfo.district;
 
-    const fallbackImages = WESTERN_BAR_IMAGES.map((img, i) => ({
+    const fallbackImages = REAL_WESTERN_BAR_IMAGES.map((img, i) => ({
       id: `img-western-fb-${Date.now()}-${i}`,
       url: img.url,
       caption: img.caption,

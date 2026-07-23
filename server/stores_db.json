@@ -59,16 +59,30 @@
     "scrapedImages": [
       {
         "id": "img-western-0",
-        "url": "https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=800&q=80",
-        "caption": "招牌特調手工雞尾酒 Signature Cocktail",
-        "aiAltTag": "尖沙咀 Tsim Sha Tsui Library Restaurant and Bar 招牌特調手工雞尾酒 Signature Cocktail",
+        "url": "https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=800&q=80",
+        "caption": "招牌煙燻特調雞尾酒 Signature Cocktail",
+        "aiAltTag": "尖沙咀 Tsim Sha Tsui Library Restaurant and Bar 招牌煙燻特調雞尾酒 Signature Cocktail",
         "category": "dish"
       },
       {
         "id": "img-western-1",
-        "url": "https://images.unsplash.com/photo-1572116469696-31de0f17cc34?auto=format&fit=crop&w=800&q=80",
-        "caption": "英倫圖書館風格奢華酒吧環境",
-        "aiAltTag": "尖沙咀 Tsim Sha Tsui Library Restaurant and Bar 英倫圖書館風格奢華酒吧環境",
+        "url": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80",
+        "caption": "圖書館英倫奢華酒吧環境 Library Lounge Interior",
+        "aiAltTag": "尖沙咀 Tsim Sha Tsui Library Restaurant and Bar 圖書館英倫奢華酒吧環境 Library Lounge Interior",
+        "category": "env"
+      },
+      {
+        "id": "img-western-2",
+        "url": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80",
+        "caption": "熟成安格斯炭烤肋眼牛排 Ribeye Steak",
+        "aiAltTag": "尖沙咀 Tsim Sha Tsui Library Restaurant and Bar 熟成安格斯炭烤肋眼牛排 Ribeye Steak",
+        "category": "dish"
+      },
+      {
+        "id": "img-western-3",
+        "url": "https://images.unsplash.com/photo-1570560258879-af7f8e1447ac?auto=format&fit=crop&w=800&q=80",
+        "caption": "露天夜景微醺調酒卡位 Rooftop Lounge View",
+        "aiAltTag": "尖沙咀 Tsim Sha Tsui Library Restaurant and Bar 露天夜景微醺調酒卡位 Rooftop Lounge View",
         "category": "env"
       }
     ],
