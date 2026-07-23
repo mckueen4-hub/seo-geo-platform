@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { StoreItem, MarketAudience } from '../types';
-import { Globe, CheckCircle, ExternalLink, Copy, Code, Sparkles } from 'lucide-react';
+import { Globe, CheckCircle, ExternalLink, Copy, Code, Sparkles, AlertCircle } from 'lucide-react';
 
 interface SubsitePreviewTabProps {
   stores: StoreItem[];
@@ -21,6 +21,10 @@ export const SubsitePreviewTab: React.FC<SubsitePreviewTabProps> = ({
 
   const activeStore = stores.find(s => s.id === selectedStoreId) || stores[0];
 
+  // 🌟 強制清洗舊域名，將所有 .georank.ai 轉化為用戶真實網域 .studioconcierge.xyz
+  const rawSubdomain = activeStore?.subdomain || 'library-restaurant-and-bar.studioconcierge.xyz';
+  const cleanSubdomain = rawSubdomain.replace(/\.georank\.ai$/g, '.studioconcierge.xyz');
+
   const getArticleForLanguage = (store: StoreItem, lang: 'TC' | 'SC' | 'EN') => {
     if (!store || !store.articles) return null;
 
@@ -32,7 +36,6 @@ export const SubsitePreviewTab: React.FC<SubsitePreviewTabProps> = ({
     if (lang === 'SC') {
       const scArt = store.articles.find(a => a.audience === 'cn');
       if (scArt) return scArt;
-      // 🌟 動態簡體中文 fallback，確保切換簡體字 100% 變動！
       return {
         id: `art-sc-fallback-${store.id}`,
         topic: '小红书宝藏种草指南',
@@ -50,7 +53,6 @@ export const SubsitePreviewTab: React.FC<SubsitePreviewTabProps> = ({
     if (lang === 'EN') {
       const enArt = store.articles.find(a => a.audience === 'en');
       if (enArt) return enArt;
-      // 🌟 動態 Native English fallback，確保切換英文 100% 變動！
       return {
         id: `art-en-fallback-${store.id}`,
         topic: 'Expat Luxury Lounge Guide',
@@ -71,10 +73,10 @@ export const SubsitePreviewTab: React.FC<SubsitePreviewTabProps> = ({
   const activeArticle = getArticleForLanguage(activeStore, activeLangTab) || activeStore?.articles[0];
 
   const subsiteUrl = activeLangTab === 'TC' 
-    ? `https://${activeStore.subdomain}/hk/` 
+    ? `https://${cleanSubdomain}/hk/` 
     : activeLangTab === 'SC' 
-    ? `https://${activeStore.subdomain}/cn/` 
-    : `https://${activeStore.subdomain}/en/`;
+    ? `https://${cleanSubdomain}/cn/` 
+    : `https://${cleanSubdomain}/en/`;
 
   const jsonLdSchema = {
     "@context": "https://schema.org",
@@ -237,8 +239,14 @@ export const SubsitePreviewTab: React.FC<SubsitePreviewTabProps> = ({
             rel="noreferrer"
             style={{ fontSize: '12px', color: '#34d399', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: '600' }}
           >
-            新分頁打開真實網址 <ExternalLink size={12} />
+            在新視窗打開子網頁 <ExternalLink size={12} />
           </a>
+        </div>
+
+        {/* DNS Tip Notice */}
+        <div style={{ background: 'rgba(59, 130, 246, 0.1)', padding: '10px 20px', borderBottom: '1px solid rgba(59, 130, 246, 0.2)', fontSize: '12px', color: '#93c5fd', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <AlertCircle size={14} color="#60a5fa" />
+          <span>💡 網域解析提示：新建的 <code>{cleanSubdomain}</code> 在 GoDaddy 設定後約需 1-3 分鐘生效，您可在此畫面上直接無縫切換體驗 3 大語言文章。</span>
         </div>
 
         {/* Subsite Simulated Live Page */}
