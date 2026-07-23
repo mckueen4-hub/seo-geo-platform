@@ -4,6 +4,7 @@ import { DailyReportTab } from './components/DailyReportTab';
 import { StoreManagementTab } from './components/StoreManagementTab';
 import { SubsitePreviewTab } from './components/SubsitePreviewTab';
 import { AiProbeSimulatorTab } from './components/AiProbeSimulatorTab';
+import { StandalonePublicSubsiteView } from './components/StandalonePublicSubsiteView';
 import { NewStoreModal } from './components/NewStoreModal';
 import { PromptCustomizerModal } from './components/PromptCustomizerModal';
 import { AltTagEditorModal } from './components/AltTagEditorModal';
@@ -13,6 +14,9 @@ import type { StoreItem, MarketAudience, TonePromptRule } from './types';
 const BACKEND_URL = 'http://localhost:3001';
 
 export function App() {
+  const [isPublicSubsiteMode, setIsPublicSubsiteMode] = useState<boolean>(false);
+  const [matchedPublicStore, setMatchedPublicStore] = useState<StoreItem | null>(null);
+
   const [activeTab, setActiveTab] = useState<'report' | 'stores' | 'subsite' | 'probe'>('report');
   const [selectedAudience, setSelectedAudience] = useState<MarketAudience>('hk');
   
@@ -26,14 +30,17 @@ export function App() {
   const [isPromptModalOpen, setIsPromptModalOpen] = useState<boolean>(false);
   const [isAltTagModalOpen, setIsAltTagModalOpen] = useState<boolean>(false);
 
+  // 🔒 權限與身份隔離：當食客/外人訪問 *.studioconcierge.xyz 子網域時，只顯示純淨餐廳專頁，完全隱藏管理後台！
   useEffect(() => {
     const hostname = window.location.hostname;
+    // 如果不是主後台域名 (www.studioconcierge.xyz 或 localhost)，而且包含子網域名稱
     if (hostname.includes('.studioconcierge.xyz') && !hostname.startsWith('www.')) {
-      const subPrefix = hostname.split('.')[0];
-      const matchedStore = stores.find(s => s.subdomain.startsWith(subPrefix));
-      if (matchedStore) {
-        setSelectedStoreId(matchedStore.id);
-        setActiveTab('subsite');
+      const subPrefix = hostname.split('.')[0].toLowerCase();
+      const targetStore = stores.find(s => s.subdomain.toLowerCase().startsWith(subPrefix));
+      
+      if (targetStore) {
+        setIsPublicSubsiteMode(true);
+        setMatchedPublicStore(targetStore);
       }
     }
   }, [stores]);
@@ -111,6 +118,12 @@ export function App() {
     }));
   };
 
+  // 🔒 如果是食客/外人通過子域名進來，渲染 100% 獨立乾淨的食客餐廳專頁（無任何內部後台數據）
+  if (isPublicSubsiteMode && matchedPublicStore) {
+    return <StandalonePublicSubsiteView store={matchedPublicStore} />;
+  }
+
+  // 🛡️ 只有管理員開啟主後台 (www.studioconcierge.xyz 或 localhost) 才能看到總盤數據！
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-main)', color: '#f3f4f6' }}>
       
