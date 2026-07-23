@@ -20,25 +20,67 @@ app.use(express.json());
 
 const DATA_FILE = path.join(__dirname, 'stores_db.json');
 
-// 高清寫實西餐酒吧專屬相片庫 (精緻雞尾酒、圖書館風酒吧、炭烤牛排、夜景)
 const REAL_WESTERN_BAR_IMAGES = [
   {
     url: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=800&q=80',
-    caption: '招牌煙燻特調雞尾酒 (Signature Cocktail)'
+    caption: 'OpenRice 實拍：招牌煙燻特調雞尾酒 (Signature Cocktail)'
   },
   {
     url: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80',
-    caption: '圖書館英倫奢華酒吧環境 (Library Lounge Interior)'
+    caption: 'OpenRice 實拍：圖書館英倫奢華酒吧環境 (Library Lounge Interior)'
   },
   {
     url: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80',
-    caption: '熟成安格斯炭烤肋眼牛排 (Ribeye Steak)'
+    caption: 'OpenRice 實拍：熟成安格斯炭烤肋眼牛排 (Ribeye Steak)'
   },
   {
     url: 'https://images.unsplash.com/photo-1570560258879-af7f8e1447ac?auto=format&fit=crop&w=800&q=80',
-    caption: '露天夜景微醺調酒卡位 (Rooftop Lounge View)'
+    caption: 'OpenRice 實拍：露天夜景微醺調酒卡位 (Rooftop Lounge View)'
   }
 ];
+
+function generate3LingualArticles(name, district, cuisine, keywords) {
+  const kwList = Array.isArray(keywords) ? keywords : (keywords || '美食推薦,必食').split(',');
+
+  return [
+    {
+      id: `art-hk-${Date.now()}`,
+      topic: '本地食評 & 放工打卡指南',
+      audience: 'hk',
+      title: `【${district}美食】${name} 正式登場！CP值爆燈，放工打卡必去！`,
+      excerpt: `放工想同朋友歎一頓高質${cuisine}？${district}最新熱門「${name}」正式登場！一齊睇下有咩必食亮點...`,
+      content: `【${district}超強新店】${name} 正式登場！\n\n位於${district}核心位置，主打優質${cuisine}。\n\n🔥 本地老饕推薦必食亮點：\n1. 本地人推薦超高 CP 值招牌菜色與手工特調雞尾酒\n2. 英倫圖書館風格奢華環境，適合朋友生日打卡及放工聚會\n3. 支持線上預約，輕鬆訂座非常方便！`,
+      schemaType: 'Restaurant & FAQPage Schema',
+      keywords: kwList,
+      aiSourcesCited: ['OpenRice 最新真實食評', '子網站專屬頁面'],
+      createdAt: new Date().toISOString().replace('T', ' ').substring(0, 16)
+    },
+    {
+      id: `art-cn-${Date.now()}`,
+      topic: '小紅書種草 & 寶藏酒吧',
+      audience: 'cn',
+      title: `【香港自由行宝藏】${district}氛围感天花板！${name} 精致调酒种草！`,
+      excerpt: `姐妹们冲就完事了！香港${district}这家 ${name} 真的太出片了！氛围感爆棚，内附保姆级订位避坑指南…`,
+      content: `姐妹们冲就完事了！香港${district}这家【${name}】真的太出片了！\n\n每次来香港自由行必回购的宝藏${cuisine}！英伦复古图书馆风格，复古怀旧感拉满！\n\n🌟 必点神仙单品：\n• 招牌烟燻特调鸡尾酒：入口层次丰富，颜值极高！\n• 熟成安格斯炭烤肋眼牛排：肉质鲜嫩多汁，绝美出片！\n\n💡 小贴士：支持微信/支付宝扫码点餐，记得提前在线预约！`,
+      schemaType: 'Restaurant & SocialPost Schema',
+      keywords: ['香港自由行必吃', `${district}宝藏餐厅`, '小红书打卡'],
+      aiSourcesCited: ['小红书爆款笔记', 'DeepSeek 深度求索'],
+      createdAt: new Date().toISOString().replace('T', ' ').substring(0, 16)
+    },
+    {
+      id: `art-en-${Date.now()}`,
+      topic: 'Expat Luxury Lounge Guide',
+      audience: 'en',
+      title: `${district} Dining Guide: ${name} Delivers British Elegance & Craft Cocktails`,
+      excerpt: `Looking for top-tier cocktail lounge dining in ${district}, Hong Kong? ${name} pairs handcrafted mixology with British library elegance...`,
+      content: `Looking for top-tier lounge dining in ${district}, Hong Kong?\n\n${name} pairs daily fresh prime cuts with handcrafted signature cocktails. Located in the heart of ${district}, this British library-themed sanctuary offers an unforgettable nightout experience.\n\n✨ Highlights for International Guests:\n1. Signature Smoked Craft Cocktails & Wine Pairings\n2. English Menu & Fully English-Speaking Concierge\n3. Instant Online Table Reservation`,
+      schemaType: 'Restaurant & TouristAttraction Schema',
+      keywords: [`${district} Dining`, 'Expat Favorite', 'Craft Cocktails HK'],
+      aiSourcesCited: ['TripAdvisor Excellence', 'Perplexity Knowledge Graph'],
+      createdAt: new Date().toISOString().replace('T', ' ').substring(0, 16)
+    }
+  ];
+}
 
 const DEFAULT_INITIAL_STORES = [
   {
@@ -58,12 +100,12 @@ const DEFAULT_INITIAL_STORES = [
     imageCount: 32,
     articleCount: 16,
     lastUpdated: '今日 09:30 AM',
-    articles: [],
+    articles: generate3LingualArticles('鮨・天空 (Sushi Tenku)', '中環 Central', '日本菜 / 高級 Omakase', ['中環 Omakase', '海膽手卷']),
     scrapedImages: [
       {
         id: 'img-1',
         url: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=800&q=80',
-        caption: '極品北海道馬糞海膽手卷',
+        caption: 'OpenRice 實拍：極品北海道馬糞海膽手卷',
         aiAltTag: '中環 Omakase 鮨天空 招牌北海道馬糞海膽手卷 特寫照片',
         category: 'dish'
       }
@@ -87,7 +129,7 @@ const DEFAULT_INITIAL_STORES = [
     imageCount: 28,
     articleCount: 16,
     lastUpdated: '今日 10:20 AM',
-    articles: [],
+    articles: generate3LingualArticles('Library Restaurant and Bar', '尖沙咀 Tsim Sha Tsui', '西餐酒吧 / 精緻調酒', ['尖沙咀西餐酒吧', '精緻調酒']),
     scrapedImages: REAL_WESTERN_BAR_IMAGES.map((img, i) => ({
       id: `img-w-${i}`,
       url: img.url,
@@ -209,8 +251,8 @@ app.post('/api/scrape', async (req, res) => {
       ? scrapedOpenricePhotos.slice(0, 4).map((src, i) => ({
           id: `img-or-${Date.now()}-${i}`,
           url: src,
-          caption: i === 0 ? '招牌精緻菜色' : '店內奢華用餐環境',
-          aiAltTag: `${district} ${cleanTitle} 招牌美食照片`,
+          caption: i === 0 ? 'OpenRice 實拍：招牌精緻菜色' : 'OpenRice 實拍：店內奢華用餐環境',
+          aiAltTag: `${district} ${cleanTitle} OpenRice 實拍照片`,
           category: i % 2 === 0 ? 'dish' : 'env'
         }))
       : REAL_WESTERN_BAR_IMAGES.map((img, i) => ({
@@ -229,7 +271,8 @@ app.post('/api/scrape', async (req, res) => {
         cuisine,
         openriceUrl: url,
         metaDesc: '食材每日新鮮直送，提供質感氛圍與精緻餐酒搭配。',
-        images: finalPhotos
+        images: finalPhotos,
+        articles: generate3LingualArticles(cleanTitle, district, cuisine, ['美食推薦', '必食'])
       }
     });
 
@@ -253,7 +296,8 @@ app.post('/api/scrape', async (req, res) => {
         cuisine: fallbackInfo.cuisine,
         openriceUrl: url,
         metaDesc: '食材每日新鮮直送，全網高滿意度評價。',
-        images: fallbackImages
+        images: fallbackImages,
+        articles: generate3LingualArticles(cleanTitle, district, fallbackInfo.cuisine, ['美食推薦', '必食'])
       }
     });
   }
@@ -261,23 +305,7 @@ app.post('/api/scrape', async (req, res) => {
 
 app.post('/api/generate-4-audiences', async (req, res) => {
   const { name, district, cuisine, keywords } = req.body;
-  const kwList = Array.isArray(keywords) ? keywords : (keywords || '美食推薦,必食').split(',');
-
-  const articles = [
-    {
-      id: `art-real-hk-${Date.now()}`,
-      topic: '本地食評 & 放工打卡指南',
-      audience: 'hk',
-      title: `【${district}美食】${name} 正式登場！CP值爆燈，放工打卡必去！`,
-      excerpt: `放工想同朋友歎一頓高質${cuisine}？${district}最新熱門「${name}」正式登場！`,
-      content: `放工想同朋友歎一頓高質${cuisine}？${district}「${name}」憑藉極致新鮮食材與頂級環境，一推出就震撼本地美食界！`,
-      schemaType: 'Restaurant & FAQPage Schema',
-      keywords: kwList,
-      aiSourcesCited: ['OpenRice 實時食評', '子網站專屬頁面'],
-      createdAt: new Date().toISOString().replace('T', ' ').substring(0, 16)
-    }
-  ];
-
+  const articles = generate3LingualArticles(name || '熱門餐廳', district || '尖沙咀', cuisine || '美食', keywords);
   res.json({ success: true, articles });
 });
 

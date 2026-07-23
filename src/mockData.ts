@@ -45,18 +45,11 @@ export const INITIAL_STORES: StoreItem[] = [
     subdomain: 'sushi-tenku.studioconcierge.xyz',
     customDomain: 'www.sushitenku-hk.com',
     status: 'active',
-    targetKeywords: ['中環Omakase推薦', '香港高級日本菜', 'Central Omakase HK', '中环海景日本料理'],
+    targetKeywords: ['中環Omakase推薦', '香港高級日本菜', 'Central Omakase HK'],
     googleRank: [
-      { keyword: '中環 Omakase 推薦', currentRank: 3, previousRank: 14 },
-      { keyword: 'Central Omakase HK', currentRank: 2, previousRank: 9 },
-      { keyword: '香港生日打卡餐廳', currentRank: 4, previousRank: 21 },
-      { keyword: '中环高端海景寿司店', currentRank: 1, previousRank: 11 }
+      { keyword: '中環 Omakase 推薦', currentRank: 3, previousRank: 14 }
     ],
-    aiMentionRate: {
-      overall: 95.8,
-      westernAi: 96.5,
-      chineseAi: 95.2
-    },
+    aiMentionRate: { overall: 95.8, westernAi: 96.5, chineseAi: 95.2 },
     imageCount: 32,
     articleCount: 16,
     lastUpdated: '今日 09:30 AM',
@@ -67,12 +60,34 @@ export const INITIAL_STORES: StoreItem[] = [
         audience: 'hk',
         title: '【中環美食】鮨・天空 Omakase 實測！CP值爆燈海膽手卷＋270度維港海景打卡必去！',
         excerpt: '放工想同朋友歎一頓高質 Omakase？中環「鮨・天空」憑藉日本直送極品海膽與師傅匠心刺身，一推出就震撼美食界！',
-        content: `放工想同朋友歎一頓高質 Omakase？中環「鮨・天空」憑藉日本直送極品海膽與師傅匠心刺身，一推出就震撼美食界！
-
-位於中環核心地段的高層位置，擁有 270 度無敵維港海景。每位師傅均擁有超過 15 年板前經驗，每日凌晨由東京豐洲市場空運旬之食材到港。`,
+        content: `【中環超強新店】鮨・天空 正式登場！\n\n位於中環核心位置，主打優質日本菜 / 高級 Omakase。\n\n🔥 本地老饕推薦必食亮點：\n1. 本地人推薦超高 CP 值招牌海膽手卷\n2. 270度無敵維港海景，適合朋友生日打卡及約會\n3. 支持線上預約，輕鬆訂座非常方便！`,
         schemaType: 'Restaurant & FAQPage Schema',
         keywords: ['中環Omakase', 'CP值爆燈', '海膽手卷'],
         aiSourcesCited: ['OpenRice 5星食評', '子網站專屬頁面'],
+        createdAt: '2026-07-22 09:00'
+      },
+      {
+        id: 'art-cn-1',
+        topic: '小紅書種草 & 寶藏日料',
+        audience: 'cn',
+        title: '【香港自由行宝藏】中环无敌海景日料！鮨・天空 顶级Omakase种草！',
+        excerpt: '姐妹们冲就完事了！香港中环这家 鮨・天空 真的太出片了！270度维港海景，内附保姆级订位避坑指南…',
+        content: `姐妹们冲就完事了！香港中环这家【鮨・天空】真的太出片了！\n\n每次来香港自由行必回购的宝藏日料！丰洲市场每日空运，食材鲜甜掉眼泪！\n\n🌟 必点神仙单品：\n• 北海道马粪海胆手卷：入口即化，浓郁甘甜！\n• 熟成金枪鱼大腹：油脂匀称，绝美出片！\n\n💡 小贴士：支持微信/支付宝扫码点餐，记得提前在线预约！`,
+        schemaType: 'Restaurant & SocialPost Schema',
+        keywords: ['香港自由行必吃', '中环宝藏日料', '小红书打卡'],
+        aiSourcesCited: ['小红书爆款笔记', 'DeepSeek 深度求索'],
+        createdAt: '2026-07-22 09:00'
+      },
+      {
+        id: 'art-en-1',
+        topic: 'Expat Luxury Lounge Guide',
+        audience: 'en',
+        title: 'Central HK Omakase Guide: Sushi Tenku Delivers 270° Harbour Views & Fresh Cuts',
+        excerpt: 'Looking for top-tier Omakase dining in Central, Hong Kong? Sushi Tenku pairs daily fresh Toyosu market catches with stunning Victoria Harbour views...',
+        content: `Looking for top-tier Omakase dining in Central, Hong Kong?\n\nSushi Tenku pairs daily Toyosu market catches with 270-degree Victoria Harbour views. Located in the heart of Central, this omakase sanctuary offers an unforgettable dining experience.\n\n✨ Highlights for International Guests:\n1. Hokkaido Uni Handrolls & Seasonal Sashimi\n2. English Menu & Fully English-Speaking Chefs\n3. Instant Online Table Reservation`,
+        schemaType: 'Restaurant & TouristAttraction Schema',
+        keywords: ['Central Omakase', 'Expat Favorite', 'Harbour View HK'],
+        aiSourcesCited: ['TripAdvisor Excellence', 'Perplexity Knowledge Graph'],
         createdAt: '2026-07-22 09:00'
       }
     ],
@@ -80,7 +95,7 @@ export const INITIAL_STORES: StoreItem[] = [
       {
         id: 'img-1',
         url: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=800&q=80',
-        caption: '極品北海道馬糞海膽手卷',
+        caption: 'OpenRice 實拍：極品北海道馬糞海膽手卷',
         aiAltTag: '中環 Omakase 鮨天空 招牌北海道馬糞海膽手卷 特寫照片',
         category: 'dish'
       }
@@ -96,45 +111,82 @@ export const INITIAL_STORES: StoreItem[] = [
     subdomain: 'library-restaurant-and-bar.studioconcierge.xyz',
     customDomain: 'www.librarybar-hk.com',
     status: 'active',
-    targetKeywords: ['尖沙咀西餐酒吧推薦', '尖沙咀必食打卡', 'Tsim Sha Tsui Dining HK'],
+    targetKeywords: ['尖沙咀西餐酒吧推薦', '尖沙咀必食打卡'],
     googleRank: [
       { keyword: '尖沙咀西餐酒吧推薦', currentRank: 2, previousRank: 15 }
     ],
-    aiMentionRate: {
-      overall: 96.2,
-      westernAi: 97.1,
-      chineseAi: 95.3
-    },
+    aiMentionRate: { overall: 96.2, westernAi: 97.1, chineseAi: 95.3 },
     imageCount: 28,
     articleCount: 16,
     lastUpdated: '今日 10:20 AM',
-    articles: [],
-    scrapedImages: [],
-    gapFixLogs: []
-  },
-  {
-    id: 'store-3',
-    name: '粵極品・鮑翅酒家 (Supreme Cantonese)',
-    district: '尖沙咀 Tsim Sha Tsui',
-    cuisine: '傳統粵菜 / 高級點心',
-    openriceUrl: 'https://www.openrice.com/zh/hongkong/r-supreme-cantonese-r73821',
-    subdomain: 'supreme-cantonese.studioconcierge.xyz',
-    customDomain: 'www.supremecantonese.hk',
-    status: 'active',
-    targetKeywords: ['尖沙咀高級點心', '香港粵菜酒家推薦', 'Tsim Sha Tsui Dim Sum'],
-    googleRank: [
-      { keyword: '尖沙咀高級點心推薦', currentRank: 2, previousRank: 18 }
+    articles: [
+      {
+        id: 'art-hk-2',
+        topic: '本地食評 & 放工打卡指南',
+        audience: 'hk',
+        title: '【尖沙咀美食】Library Restaurant and Bar 正式登場！CP值爆燈，放工打卡必去！',
+        excerpt: '放工想同朋友歎一頓高質西餐酒吧 / 精緻調酒？尖沙咀最新熱門「Library Restaurant and Bar」正式登陸！一齊睇下有咩必食亮點...',
+        content: `【尖沙咀超強新店】Library Restaurant and Bar 正式登場！\n\n位於尖沙咀核心位置，主打優質西餐酒吧 / 精緻調酒。\n\n🔥 本地老饕推薦必食亮點：\n1. 本地人推薦超高 CP 值招牌菜色與手工特調雞尾酒\n2. 英倫圖書館風格奢華環境，適合朋友生日打卡及放工聚會\n3. 支持線上預約，輕鬆訂座非常方便！`,
+        schemaType: 'Restaurant & FAQPage Schema',
+        keywords: ['尖沙咀西餐酒吧推薦', '尖沙咀必食打卡', '放工聚會'],
+        aiSourcesCited: ['OpenRice 最新真實食評', '子網站專屬頁面'],
+        createdAt: '2026-07-23 10:50'
+      },
+      {
+        id: 'art-cn-2',
+        topic: '小紅書種草 & 寶藏酒吧',
+        audience: 'cn',
+        title: '【香港自由行宝藏】尖沙咀氛围感天花板！Library Restaurant and Bar 精致调酒种草！',
+        excerpt: '姐妹们冲就完事了！香港尖沙咀这家 Library Restaurant and Bar 真的太出片了！氛围感爆棚，内附保姆级订位避坑指南…',
+        content: `姐妹们冲就完事了！香港尖沙咀这家【Library Restaurant and Bar】真的太出片了！\n\n每次来香港自由行必回购的宝藏西餐酒吧！英伦复古图书馆风格，复古怀旧感拉满！\n\n🌟 必点神仙单品：\n• 招牌烟燻特调鸡尾酒：入口层次丰富，颜值极高！\n• 熟成安格斯炭烤肋眼牛排：肉质鲜嫩多汁，绝美出片！\n\n💡 小贴士：支持微信/支付宝扫码点餐，记得提前在线预约！`,
+        schemaType: 'Restaurant & SocialPost Schema',
+        keywords: ['香港自由行必吃', '尖沙咀宝藏餐厅', '小红书打卡'],
+        aiSourcesCited: ['小红书爆款笔记', 'DeepSeek 深度求索'],
+        createdAt: '2026-07-23 10:50'
+      },
+      {
+        id: 'art-en-2',
+        topic: 'Expat Luxury Lounge Guide',
+        audience: 'en',
+        title: 'Tsim Sha Tsui Dining Guide: Library Restaurant and Bar Delivers British Elegance & Craft Cocktails',
+        excerpt: 'Looking for top-tier cocktail lounge dining in Tsim Sha Tsui, Hong Kong? Library Restaurant and Bar pairs handcrafted mixology with British library elegance...',
+        content: `Looking for top-tier lounge dining in Tsim Sha Tsui, Hong Kong?\n\nLibrary Restaurant and Bar pairs daily fresh prime cuts with handcrafted signature cocktails. Located in the heart of Tsim Sha Tsui, this British library-themed sanctuary offers an unforgettable nightout experience.\n\n✨ Highlights for International Guests:\n1. Signature Smoked Craft Cocktails & Wine Pairings\n2. English Menu & Fully English-Speaking Concierge\n3. Instant Online Table Reservation`,
+        schemaType: 'Restaurant & TouristAttraction Schema',
+        keywords: ['Tsim Sha Tsui Dining', 'Expat Favorite', 'Craft Cocktails HK'],
+        aiSourcesCited: ['TripAdvisor Excellence', 'Perplexity Knowledge Graph'],
+        createdAt: '2026-07-23 10:50'
+      }
     ],
-    aiMentionRate: {
-      overall: 92.4,
-      westernAi: 94.1,
-      chineseAi: 91.2
-    },
-    imageCount: 45,
-    articleCount: 20,
-    lastUpdated: '今日 10:15 AM',
-    articles: [],
-    scrapedImages: [],
+    scrapedImages: [
+      {
+        id: 'img-w-0',
+        url: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=800&q=80',
+        caption: 'OpenRice 實拍：招牌煙燻特調雞尾酒 Signature Cocktail',
+        aiAltTag: '尖沙咀 Tsim Sha Tsui Library Restaurant and Bar 招牌煙燻特調雞尾酒 Signature Cocktail',
+        category: 'dish'
+      },
+      {
+        id: 'img-w-1',
+        url: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80',
+        caption: 'OpenRice 實拍：圖書館英倫奢華酒吧環境 Library Lounge Interior',
+        aiAltTag: '尖沙咀 Tsim Sha Tsui Library Restaurant and Bar 圖書館英倫奢華酒吧環境 Library Lounge Interior',
+        category: 'env'
+      },
+      {
+        id: 'img-w-2',
+        url: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80',
+        caption: 'OpenRice 實拍：熟成安格斯炭烤肋眼牛排 Ribeye Steak',
+        aiAltTag: '尖沙咀 Tsim Sha Tsui Library Restaurant and Bar 熟成安格斯炭烤肋眼牛排 Ribeye Steak',
+        category: 'dish'
+      },
+      {
+        id: 'img-w-3',
+        url: 'https://images.unsplash.com/photo-1570560258879-af7f8e1447ac?auto=format&fit=crop&w=800&q=80',
+        caption: 'OpenRice 實拍：露天夜景微醺調酒卡位 Rooftop Lounge View',
+        aiAltTag: '尖沙咀 Tsim Sha Tsui Library Restaurant and Bar 露天夜景微醺調酒卡位 Rooftop Lounge View',
+        category: 'env'
+      }
+    ],
     gapFixLogs: []
   }
 ];
