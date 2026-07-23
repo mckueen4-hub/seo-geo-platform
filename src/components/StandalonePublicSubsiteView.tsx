@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import type { StoreItem } from '../types';
-import { ExternalLink, MapPin, Utensils, Calendar, Heart } from 'lucide-react';
+import { ExternalLink, MapPin, Utensils, Calendar, Heart, RefreshCw } from 'lucide-react';
 
 interface StandalonePublicSubsiteViewProps {
   store: StoreItem;
@@ -10,19 +10,37 @@ export const StandalonePublicSubsiteView: React.FC<StandalonePublicSubsiteViewPr
   const [activeLang, setActiveLang] = useState<'hk' | 'cn' | 'en'>('hk');
   const [likeCount, setLikeCount] = useState<number>(382);
   const [isLiked, setIsLiked] = useState<boolean>(false);
+  const [rotationOffset, setRotationOffset] = useState<number>(0);
 
   const currentArticle = store.articles.find(a => a.audience === activeLang) || store.articles[0];
+
+  // 🔄 每日自動依據日期 (Date Seed) 輪播照片排序
+  const rotatedImages = useMemo(() => {
+    if (!store.scrapedImages || store.scrapedImages.length === 0) return [];
+    const todayStr = new Date().toISOString().slice(0, 10);
+    let hash = 0;
+    for (let i = 0; i < todayStr.length; i++) {
+      hash = (hash << 5) - hash + todayStr.charCodeAt(i);
+      hash |= 0;
+    }
+    const shift = (Math.abs(hash) + rotationOffset) % store.scrapedImages.length;
+    return [...store.scrapedImages.slice(shift), ...store.scrapedImages.slice(0, shift)];
+  }, [store.scrapedImages, rotationOffset]);
 
   const handleLike = () => {
     setIsLiked(!isLiked);
     setLikeCount(prev => isLiked ? prev - 1 : prev + 1);
   };
 
+  const handleSimulateDailyRotation = () => {
+    setRotationOffset(prev => prev + 1);
+  };
+
   const jsonLdSchema = {
     "@context": "https://schema.org",
     "@type": "Restaurant",
     "name": store.name,
-    "image": store.scrapedImages[0]?.url || "https://images.unsplash.com/photo-1514933651103-005eec06c04b",
+    "image": rotatedImages[0]?.url || "https://images.unsplash.com/photo-1514933651103-005eec06c04b",
     "address": {
       "@type": "PostalAddress",
       "addressLocality": store.district,
@@ -40,7 +58,7 @@ export const StandalonePublicSubsiteView: React.FC<StandalonePublicSubsiteViewPr
 
       {/* Clean Public Top Bar */}
       <header style={{ background: '#111827', borderBottom: '1px solid #1f293d', position: 'sticky', top: 0, zIndex: 100, backdropFilter: 'blur(12px)' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '14px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '14px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <span style={{ fontSize: '20px', fontWeight: '900', background: 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
@@ -51,69 +69,95 @@ export const StandalonePublicSubsiteView: React.FC<StandalonePublicSubsiteViewPr
             </span>
           </div>
 
-          {/* Language Switcher for Customers */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#0b0f19', padding: '4px', borderRadius: '8px', border: '1px solid #1f293d' }}>
+          {/* Controls: Language Switcher + Demo Daily Rotation Button */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <button
-              onClick={() => setActiveLang('hk')}
+              onClick={handleSimulateDailyRotation}
+              title="點擊模擬每日 AI 自動更新文章與照片輪播"
               style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
                 padding: '6px 12px',
-                borderRadius: '6px',
-                border: 'none',
+                borderRadius: '8px',
+                background: 'rgba(251, 191, 36, 0.15)',
+                color: '#fbbf24',
+                border: '1px solid rgba(251, 191, 36, 0.3)',
                 fontSize: '12px',
                 fontWeight: '700',
-                cursor: 'pointer',
-                background: activeLang === 'hk' ? '#3b82f6' : 'transparent',
-                color: activeLang === 'hk' ? '#fff' : '#9ca3af'
+                cursor: 'pointer'
               }}
             >
-              🇭🇰 繁體中文
+              <RefreshCw size={13} />
+              🔄 模擬每日 AI 圖片輪播
             </button>
-            <button
-              onClick={() => setActiveLang('cn')}
-              style={{
-                padding: '6px 12px',
-                borderRadius: '6px',
-                border: 'none',
-                fontSize: '12px',
-                fontWeight: '700',
-                cursor: 'pointer',
-                background: activeLang === 'cn' ? '#f43f5e' : 'transparent',
-                color: activeLang === 'cn' ? '#fff' : '#9ca3af'
-              }}
-            >
-              🇨🇳 简体中文
-            </button>
-            <button
-              onClick={() => setActiveLang('en')}
-              style={{
-                padding: '6px 12px',
-                borderRadius: '6px',
-                border: 'none',
-                fontSize: '12px',
-                fontWeight: '700',
-                cursor: 'pointer',
-                background: activeLang === 'en' ? '#10b981' : 'transparent',
-                color: activeLang === 'en' ? '#fff' : '#9ca3af'
-              }}
-            >
-              🌎 English
-            </button>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#0b0f19', padding: '4px', borderRadius: '8px', border: '1px solid #1f293d' }}>
+              <button
+                onClick={() => setActiveLang('hk')}
+                style={{
+                  padding: '6px 12px',
+                  borderRadius: '6px',
+                  border: 'none',
+                  fontSize: '12px',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  background: activeLang === 'hk' ? '#3b82f6' : 'transparent',
+                  color: activeLang === 'hk' ? '#fff' : '#9ca3af'
+                }}
+              >
+                🇭🇰 繁體中文
+              </button>
+              <button
+                onClick={() => setActiveLang('cn')}
+                style={{
+                  padding: '6px 12px',
+                  borderRadius: '6px',
+                  border: 'none',
+                  fontSize: '12px',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  background: activeLang === 'cn' ? '#f43f5e' : 'transparent',
+                  color: activeLang === 'cn' ? '#fff' : '#9ca3af'
+                }}
+              >
+                🇨🇳 简体中文
+              </button>
+              <button
+                onClick={() => setActiveLang('en')}
+                style={{
+                  padding: '6px 12px',
+                  borderRadius: '6px',
+                  border: 'none',
+                  fontSize: '12px',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  background: activeLang === 'en' ? '#10b981' : 'transparent',
+                  color: activeLang === 'en' ? '#fff' : '#9ca3af'
+                }}
+              >
+                🌎 English
+              </button>
+            </div>
           </div>
 
         </div>
       </header>
 
-      {/* Hero Banner Section */}
-      <section style={{ position: 'relative', height: '360px', overflow: 'hidden', background: '#111827' }}>
+      {/* Hero Banner Section (Dynamically rotated based on daily seed) */}
+      <section style={{ position: 'relative', height: '380px', overflow: 'hidden', background: '#111827' }}>
         <img
-          src={store.scrapedImages[0]?.url || "https://images.unsplash.com/photo-1514933651103-005eec06c04b"}
-          alt={store.scrapedImages[0]?.aiAltTag || store.name}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.65)' }}
+          src={rotatedImages[0]?.url || "https://static7.orstatic.com/userphoto2/photo/1R/1E35/09W6HYF78C0542CE2C17F5lx.jpg"}
+          alt={rotatedImages[0]?.aiAltTag || store.name}
+          style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.65)', transition: 'all 0.5s ease-in-out' }}
         />
 
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '40px 24px', background: 'linear-gradient(to top, #0b0f19 0%, transparent 100%)' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '16px' }}>
             <div>
+              <div style={{ fontSize: '12px', color: '#fbbf24', fontWeight: '700', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <RefreshCw size={12} /> 今日首選主打實拍照：{rotatedImages[0]?.caption || 'OpenRice 官方實拍'}
+              </div>
               <h1 style={{ fontSize: '32px', fontWeight: '900', color: '#fff', margin: '0 0 8px' }}>
                 {store.name}
               </h1>
@@ -177,15 +221,26 @@ export const StandalonePublicSubsiteView: React.FC<StandalonePublicSubsiteViewPr
       {/* Main Content Body */}
       <main style={{ maxWidth: '1200px', margin: '0 auto', padding: '36px 24px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
         
-        {/* Photo Gallery */}
+        {/* Photo Gallery (Daily Rotated) */}
         <section>
-          <h2 style={{ fontSize: '18px', fontWeight: '800', color: '#fff', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            📸 餐廳實拍照與特色氛圍
-          </h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: '800', color: '#fff', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              📸 OpenRice 官方實拍照（每日 AI 自動調動輪播）
+            </h2>
+            <span style={{ fontSize: '12px', color: '#34d399', fontWeight: '600' }}>
+              ✓ 每日動態刷新，維持 18 大 AI 高新鮮度權重
+            </span>
+          </div>
+
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
-            {store.scrapedImages.map((img, idx) => (
-              <div key={idx} style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid #1f293d', background: '#111827', height: '180px' }}>
-                <img src={img.url} alt={img.aiAltTag} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            {rotatedImages.map((img, idx) => (
+              <div key={idx} style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid #1f293d', background: '#111827', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ height: '170px', width: '100%', overflow: 'hidden' }}>
+                  <img src={img.url} alt={img.aiAltTag} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+                <div style={{ padding: '10px 12px', fontSize: '12px', color: '#d1d5db', fontWeight: '600', borderTop: '1px solid #1f293d' }}>
+                  {img.caption}
+                </div>
               </div>
             ))}
           </div>
