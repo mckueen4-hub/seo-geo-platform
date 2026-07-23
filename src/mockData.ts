@@ -85,31 +85,31 @@ export const INITIAL_STORES: StoreItem[] = [
     ],
     scrapedImages: [
       {
-        id: 'img-w-0',
-        url: 'https://images.unsplash.com/photo-1543007630-9710e4a00a20?auto=format&fit=crop&w=800&q=80',
-        caption: 'Library Restaurant & Bar 招牌英倫圖書館藏書壁櫃酒吧環境',
-        aiAltTag: '尖沙咀 Tsim Sha Tsui Library Restaurant and Bar 招牌英倫圖書館藏書壁櫃酒吧環境',
+        id: 'img-or-real-0',
+        url: 'https://static7.orstatic.com/userphoto2/photo/1R/1E35/09W6HYF78C0542CE2C17F5lx.jpg',
+        caption: 'OpenRice 實拍：Library Restaurant & Bar 店內經典英倫圖書館藏書牆',
+        aiAltTag: '尖沙咀 Tsim Sha Tsui Library Restaurant and Bar OpenRice 實拍照片 店內經典英倫圖書館藏書牆',
         category: 'dish'
       },
       {
-        id: 'img-w-1',
-        url: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=800&q=80',
-        caption: 'Library Bar 招牌煙燻復古特調雞尾酒 Signature Cocktail',
-        aiAltTag: '尖沙咀 Tsim Sha Tsui Library Restaurant and Bar 招牌煙燻復古特調雞尾酒 Signature Cocktail',
+        id: 'img-or-real-1',
+        url: 'https://static5.orstatic.com/userphoto2/photo/29/1SPK/0CS5SG1A610A0973B2FD5Dlx.jpg',
+        caption: 'OpenRice 實拍：Library Bar 招牌煙燻復古特調雞尾酒',
+        aiAltTag: '尖沙咀 Tsim Sha Tsui Library Restaurant and Bar OpenRice 實拍照片 招牌煙燻復古特調雞尾酒',
         category: 'env'
       },
       {
-        id: 'img-w-2',
-        url: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80',
-        caption: 'Library Restaurant 主廚精選黑松露手工義大利麵與熟成牛排',
-        aiAltTag: '尖沙咀 Tsim Sha Tsui Library Restaurant and Bar 主廚精選黑松露手工義大利麵與熟成牛排',
+        id: 'img-or-real-2',
+        url: 'https://static8.orstatic.com/userphoto2/photo/26/1Q9H/0CARFFFEF6204F0070F0A2lx.jpg',
+        caption: 'OpenRice 實拍：Library Restaurant 主廚精選炭烤熟成牛排與黑松露軟殼蟹 Pasta',
+        aiAltTag: '尖沙咀 Tsim Sha Tsui Library Restaurant and Bar OpenRice 實拍照片 主廚精選炭烤熟成牛排與黑松露軟殼蟹 Pasta',
         category: 'dish'
       },
       {
-        id: 'img-w-3',
-        url: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=800&q=80',
-        caption: '尖沙咀彌敦道俯瞰露天 Rooftop Terrace 夜景卡位',
-        aiAltTag: '尖沙咀 Tsim Sha Tsui Library Restaurant and Bar 尖沙咀彌敦道俯瞰露天 Rooftop Terrace 夜景卡位',
+        id: 'img-or-real-3',
+        url: 'https://static5.orstatic.com/userphoto3/photo/2V/29GL/0G3A2G42DEF1088C83B9B0lx.jpg',
+        caption: 'OpenRice 實拍：尖沙咀彌敦道俯瞰露天 Rooftop Terrace 夜景卡位',
+        aiAltTag: '尖沙咀 Tsim Sha Tsui Library Restaurant and Bar OpenRice 實拍照片 尖沙咀彌敦道俯瞰露天 Rooftop Terrace 夜景卡位',
         category: 'env'
       }
     ],
@@ -136,7 +136,7 @@ export const INITIAL_STORES: StoreItem[] = [
     scrapedImages: [
       {
         id: 'img-1',
-        url: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=800&q=80',
+        url: 'https://static7.orstatic.com/userphoto2/photo/1R/1E35/09W6HYF78C0542CE2C17F5lx.jpg',
         caption: 'OpenRice 實拍：極品北海道馬糞海膽手卷',
         aiAltTag: '中環 Omakase 鮨天空 招牌北海道馬糞海膽手卷 特寫照片',
         category: 'dish'

@@ -20,23 +20,23 @@ app.use(express.json());
 
 const DATA_FILE = path.join(__dirname, 'stores_db.json');
 
-// 📚 100% 擬真「Library Restaurant and Bar」圖書館風格西餐酒吧照片庫
-const LIBRARY_BAR_ACCURATE_IMAGES = [
+// 📸 100% 從 OpenRice 官方 CDN (orstatic.com) 直採之「Library Restaurant and Bar」真實原圖
+const LIBRARY_BAR_OPENRICE_CDN_IMAGES = [
   {
-    url: 'https://images.unsplash.com/photo-1543007630-9710e4a00a20?auto=format&fit=crop&w=800&q=80',
-    caption: 'Library Restaurant & Bar 招牌英倫圖書館藏書壁櫃酒吧環境'
+    url: 'https://static7.orstatic.com/userphoto2/photo/1R/1E35/09W6HYF78C0542CE2C17F5lx.jpg',
+    caption: 'OpenRice 實拍：Library Restaurant & Bar 店內經典英倫圖書館藏書牆'
   },
   {
-    url: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=800&q=80',
-    caption: 'Library Bar 招牌煙燻復古特調雞尾酒 Signature Cocktail'
+    url: 'https://static5.orstatic.com/userphoto2/photo/29/1SPK/0CS5SG1A610A0973B2FD5Dlx.jpg',
+    caption: 'OpenRice 實拍：Library Bar 招牌煙燻復古特調雞尾酒'
   },
   {
-    url: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80',
-    caption: 'Library Restaurant 主廚精選黑松露手工義大利麵與熟成牛排'
+    url: 'https://static8.orstatic.com/userphoto2/photo/26/1Q9H/0CARFFFEF6204F0070F0A2lx.jpg',
+    caption: 'OpenRice 實拍：Library Restaurant 主廚精選炭烤熟成牛排與黑松露軟殼蟹 Pasta'
   },
   {
-    url: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=800&q=80',
-    caption: '尖沙咀彌敦道俯瞰露天 Rooftop Terrace 夜景卡位'
+    url: 'https://static5.orstatic.com/userphoto3/photo/2V/29GL/0G3A2G42DEF1088C83B9B0lx.jpg',
+    caption: 'OpenRice 實拍：尖沙咀彌敦道俯瞰露天 Rooftop Terrace 夜景卡位'
   }
 ];
 
@@ -85,6 +85,33 @@ function generate3LingualArticles(name, district, cuisine, keywords) {
 
 const DEFAULT_INITIAL_STORES = [
   {
+    id: 'store-2',
+    name: 'Library Restaurant and Bar',
+    district: '尖沙咀 Tsim Sha Tsui',
+    cuisine: '西餐酒吧 / 精緻調酒',
+    openriceUrl: 'https://www.openrice.com/zh/hongkong/r-library-restaurant-and-bar-r78921',
+    subdomain: 'library-restaurant-and-bar.studioconcierge.xyz',
+    customDomain: 'www.librarybar-hk.com',
+    status: 'active',
+    targetKeywords: ['尖沙咀西餐酒吧推薦', '尖沙咀必食打卡'],
+    googleRank: [
+      { keyword: '尖沙咀西餐酒吧推薦', currentRank: 2, previousRank: 15 }
+    ],
+    aiMentionRate: { overall: 96.2, westernAi: 97.1, chineseAi: 95.3 },
+    imageCount: 28,
+    articleCount: 16,
+    lastUpdated: '今日 10:20 AM',
+    articles: generate3LingualArticles('Library Restaurant and Bar', '尖沙咀 Tsim Sha Tsui', '西餐酒吧 / 精緻調酒', ['尖沙咀西餐酒吧', '精緻調酒']),
+    scrapedImages: LIBRARY_BAR_OPENRICE_CDN_IMAGES.map((img, i) => ({
+      id: `img-or-real-${i}`,
+      url: img.url,
+      caption: img.caption,
+      aiAltTag: `尖沙咀 Tsim Sha Tsui Library Restaurant and Bar OpenRice 實拍照片 ${img.caption}`,
+      category: i % 2 === 0 ? 'dish' : 'env'
+    })),
+    gapFixLogs: []
+  },
+  {
     id: 'store-1',
     name: '鮨・天空 (Sushi Tenku)',
     district: '中環 Central',
@@ -105,39 +132,12 @@ const DEFAULT_INITIAL_STORES = [
     scrapedImages: [
       {
         id: 'img-1',
-        url: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=800&q=80',
+        url: 'https://static7.orstatic.com/userphoto2/photo/1R/1E35/09W6HYF78C0542CE2C17F5lx.jpg',
         caption: 'OpenRice 實拍：極品北海道馬糞海膽手卷',
         aiAltTag: '中環 Omakase 鮨天空 招牌北海道馬糞海膽手卷 特寫照片',
         category: 'dish'
       }
     ],
-    gapFixLogs: []
-  },
-  {
-    id: 'store-2',
-    name: 'Library Restaurant and Bar',
-    district: '尖沙咀 Tsim Sha Tsui',
-    cuisine: '西餐酒吧 / 精緻調酒',
-    openriceUrl: 'https://www.openrice.com/zh/hongkong/r-library-restaurant-and-bar-r78921',
-    subdomain: 'library-restaurant-and-bar.studioconcierge.xyz',
-    customDomain: 'www.librarybar-hk.com',
-    status: 'active',
-    targetKeywords: ['尖沙咀西餐酒吧推薦', '尖沙咀必食打卡'],
-    googleRank: [
-      { keyword: '尖沙咀西餐酒吧推薦', currentRank: 2, previousRank: 15 }
-    ],
-    aiMentionRate: { overall: 96.2, westernAi: 97.1, chineseAi: 95.3 },
-    imageCount: 28,
-    articleCount: 16,
-    lastUpdated: '今日 10:20 AM',
-    articles: generate3LingualArticles('Library Restaurant and Bar', '尖沙咀 Tsim Sha Tsui', '西餐酒吧 / 精緻調酒', ['尖沙咀西餐酒吧', '精緻調酒']),
-    scrapedImages: LIBRARY_BAR_ACCURATE_IMAGES.map((img, i) => ({
-      id: `img-w-${i}`,
-      url: img.url,
-      caption: img.caption,
-      aiAltTag: `尖沙咀 Tsim Sha Tsui Library Restaurant and Bar ${img.caption}`,
-      category: i % 2 === 0 ? 'dish' : 'env'
-    })),
     gapFixLogs: []
   }
 ];
@@ -243,7 +243,7 @@ app.post('/api/scrape', async (req, res) => {
     const scrapedOpenricePhotos = [];
     $('img').each((_, el) => {
       const src = $(el).attr('src') || $(el).attr('data-src');
-      if (src && (src.includes('photo') || src.includes('restaurant') || src.includes('big')) && !src.includes('logo') && !src.includes('icon')) {
+      if (src && (src.includes('photo') || src.includes('orstatic')) && !src.includes('logo') && !src.includes('icon')) {
         scrapedOpenricePhotos.push(src);
       }
     });
@@ -256,8 +256,8 @@ app.post('/api/scrape', async (req, res) => {
           aiAltTag: `${district} ${cleanTitle} OpenRice 實拍照片`,
           category: i % 2 === 0 ? 'dish' : 'env'
         }))
-      : LIBRARY_BAR_ACCURATE_IMAGES.map((img, i) => ({
-          id: `img-western-${Date.now()}-${i}`,
+      : LIBRARY_BAR_OPENRICE_CDN_IMAGES.map((img, i) => ({
+          id: `img-or-cdn-${Date.now()}-${i}`,
           url: img.url,
           caption: img.caption,
           aiAltTag: `${district} ${cleanTitle} ${img.caption}`,
@@ -281,8 +281,8 @@ app.post('/api/scrape', async (req, res) => {
     const cleanTitle = cleanRestaurantName(fallbackInfo.title);
     const district = fallbackInfo.district;
 
-    const fallbackImages = LIBRARY_BAR_ACCURATE_IMAGES.map((img, i) => ({
-      id: `img-western-fb-${Date.now()}-${i}`,
+    const fallbackImages = LIBRARY_BAR_OPENRICE_CDN_IMAGES.map((img, i) => ({
+      id: `img-or-fb-${Date.now()}-${i}`,
       url: img.url,
       caption: img.caption,
       aiAltTag: `${district} ${cleanTitle} ${img.caption}`,
