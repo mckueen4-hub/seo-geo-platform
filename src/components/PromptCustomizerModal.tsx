@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { TonePromptRule, MarketAudience } from '../types';
-import { X, Sliders, CheckCircle2, Save, Sparkles, MessageSquare, AlertCircle } from 'lucide-react';
+import { X, Sliders, CheckCircle2, Save, Sparkles, MessageSquare, AlertCircle, ShieldCheck } from 'lucide-react';
 
 interface PromptCustomizerModalProps {
   isOpen: boolean;
@@ -34,7 +34,7 @@ export const PromptCustomizerModal: React.FC<PromptCustomizerModalProps> = ({
 
   const handleSave = () => {
     onSaveRules(currentRules);
-    setSaveNotice('已成功儲存 AI 受眾語調 Prompt 規則！次日文章產出將自動採用最新指令。');
+    setSaveNotice('已成功儲存 AI 受眾語調 Prompt 與防幻覺安全護欄！');
     setTimeout(() => {
       setSaveNotice(null);
       onClose();
@@ -76,10 +76,10 @@ export const PromptCustomizerModal: React.FC<PromptCustomizerModalProps> = ({
 
         <h2 style={{ fontSize: '20px', fontWeight: '800', color: '#f3f4f6', margin: '0 0 6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Sliders size={22} color="#8b5cf6" />
-          AI 提示詞 (Prompt) 與四受眾語調規則微調面板
+          AI 提示詞 (Prompt) 與菜單事實防幻覺護欄設定
         </h2>
         <p style={{ fontSize: '13px', color: '#9ca3af', marginBottom: '20px' }}>
-          管理員可針對特定文化受眾，自訂 AI 洗稿與內容生成時的風格描述、關鍵字強制包含規則及禁用詞清單。
+          管理員可設定 AI 生成限制，<strong>嚴格限定 AI 只能根據 OpenRice 及商家真實菜單撰寫</strong>，禁止虛構不存在的食物或設施！
         </p>
 
         {saveNotice && (
@@ -100,6 +100,19 @@ export const PromptCustomizerModal: React.FC<PromptCustomizerModalProps> = ({
             {saveNotice}
           </div>
         )}
+
+        {/* Global Strict Anti-Hallucination Guardrail Banner */}
+        <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '12px 16px', borderRadius: '10px', marginBottom: '20px', display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+          <ShieldCheck size={20} color="#34d399" style={{ flexShrink: 0, marginTop: '2px' }} />
+          <div>
+            <div style={{ fontSize: '13px', fontWeight: '700', color: '#34d399' }}>
+              🛡️ 全局菜單事實防幻覺安全護欄 (Strict Anti-Hallucination Guardrail) 已啟用
+            </div>
+            <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '2px', lineHeight: '1.5' }}>
+              系統已注入指令約束：AI 生成文章時，<strong>強制僅能引用店家已驗證的菜單項目 (`store.menuItems`) 與 OpenRice 實拍標籤</strong>。嚴禁憑空捏造該餐廳未提供的餐點或服務！
+            </div>
+          </div>
+        </div>
 
         {/* Audience Selector Tabs */}
         <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', background: '#111827', padding: '6px', borderRadius: '10px', border: '1px solid #374151' }}>

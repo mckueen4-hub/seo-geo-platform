@@ -10,6 +10,7 @@ export interface StoreItem {
   customDomain?: string;
   status: 'active' | 'analyzing' | 'building';
   targetKeywords: string[];
+  menuItems: string[]; // 🛡️ 官方驗證真實菜單清單 (防止 AI 虛構不存在的食物)
   googleRank: {
     keyword: string;
     currentRank: number;
@@ -70,4 +71,5 @@ export interface TonePromptRule {
   keywordsRule: string;
   prohibitedWords: string;
   styleDescription: string;
+  menuGuardrailNote?: string;
 }

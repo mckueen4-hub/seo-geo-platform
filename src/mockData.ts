@@ -38,6 +38,13 @@ export const INITIAL_STORES: StoreItem[] = [
     customDomain: 'www.librarybar-hk.com',
     status: 'active',
     targetKeywords: ['尖沙咀西餐酒吧推薦', '尖沙咀必食打卡'],
+    menuItems: [
+      '炭烤熟成安格斯肋眼牛排',
+      '黑松露軟殼蟹義大利麵',
+      '招牌煙燻特調雞尾酒 Signature Cocktails',
+      '英倫圖書館藏書牆打卡位',
+      '露天 Rooftop Terrace 夜景卡位'
+    ],
     googleRank: [
       { keyword: '尖沙咀西餐酒吧推薦', currentRank: 2, previousRank: 15 }
     ],
@@ -125,6 +132,11 @@ export const INITIAL_STORES: StoreItem[] = [
     customDomain: 'www.sushitenku-hk.com',
     status: 'active',
     targetKeywords: ['中環Omakase推薦', '香港高級日本菜', 'Central Omakase HK'],
+    menuItems: [
+      '極品北海道馬糞海膽手卷',
+      '黑鮪魚大腹 Omakase 壽司',
+      '季節限定日本產赤身壽司'
+    ],
     googleRank: [
       { keyword: '中環 Omakase 推薦', currentRank: 3, previousRank: 14 }
     ],

@@ -140,6 +140,11 @@ export const NewStoreModal: React.FC<NewStoreModalProps> = ({
       customDomain: customDomain || undefined,
       status: 'active',
       targetKeywords: kwArray,
+      menuItems: [
+        `${finalName} 招牌精緻菜色`,
+        `${finalDistrict} ${finalCuisine} 推薦單品`,
+        'OpenRice 社區熱門點餐項目'
+      ],
       googleRank: [
         { keyword: kwArray[0] || `${finalDistrict} 美食`, currentRank: 3, previousRank: 18 },
         { keyword: kwArray[1] || `${finalName} 必食`, currentRank: 1, previousRank: 6 }
