@@ -20,7 +20,6 @@ app.use(express.json());
 
 const DATA_FILE = path.join(__dirname, 'stores_db.json');
 
-// 西餐酒吧真實高清圖片庫
 const WESTERN_BAR_IMAGES = [
   {
     url: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=800&q=80',
@@ -40,13 +39,76 @@ const WESTERN_BAR_IMAGES = [
   }
 ];
 
+const DEFAULT_INITIAL_STORES = [
+  {
+    id: 'store-1',
+    name: '鮨・天空 (Sushi Tenku)',
+    district: '中環 Central',
+    cuisine: '日本菜 / 高級 Omakase',
+    openriceUrl: 'https://www.openrice.com/zh/hongkong/r-sushi-tenku-r82910',
+    subdomain: 'sushi-tenku.studioconcierge.xyz',
+    customDomain: 'www.sushitenku-hk.com',
+    status: 'active',
+    targetKeywords: ['中環Omakase推薦', '香港高級日本菜', 'Central Omakase HK'],
+    googleRank: [
+      { keyword: '中環 Omakase 推薦', currentRank: 3, previousRank: 14 }
+    ],
+    aiMentionRate: { overall: 95.8, westernAi: 96.5, chineseAi: 95.2 },
+    imageCount: 32,
+    articleCount: 16,
+    lastUpdated: '今日 09:30 AM',
+    articles: [],
+    scrapedImages: [
+      {
+        id: 'img-1',
+        url: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=800&q=80',
+        caption: '極品北海道馬糞海膽手卷',
+        aiAltTag: '中環 Omakase 鮨天空 招牌北海道馬糞海膽手卷 特寫照片',
+        category: 'dish'
+      }
+    ],
+    gapFixLogs: []
+  },
+  {
+    id: 'store-2',
+    name: 'Library Restaurant and Bar',
+    district: '尖沙咀 Tsim Sha Tsui',
+    cuisine: '西餐酒吧 / 精緻調酒',
+    openriceUrl: 'https://www.openrice.com/zh/hongkong/r-library-restaurant-and-bar-r78921',
+    subdomain: 'library-restaurant-and-bar.studioconcierge.xyz',
+    customDomain: 'www.librarybar-hk.com',
+    status: 'active',
+    targetKeywords: ['尖沙咀西餐酒吧推薦', '尖沙咀必食打卡'],
+    googleRank: [
+      { keyword: '尖沙咀西餐酒吧推薦', currentRank: 2, previousRank: 15 }
+    ],
+    aiMentionRate: { overall: 96.2, westernAi: 97.1, chineseAi: 95.3 },
+    imageCount: 28,
+    articleCount: 16,
+    lastUpdated: '今日 10:20 AM',
+    articles: [],
+    scrapedImages: WESTERN_BAR_IMAGES.map((img, i) => ({
+      id: `img-w-${i}`,
+      url: img.url,
+      caption: img.caption,
+      aiAltTag: `尖沙咀 Tsim Sha Tsui Library Restaurant and Bar ${img.caption}`,
+      category: i % 2 === 0 ? 'dish' : 'env'
+    })),
+    gapFixLogs: []
+  }
+];
+
 function getStoresFromDb() {
-  if (!fs.existsSync(DATA_FILE)) return [];
+  if (!fs.existsSync(DATA_FILE)) {
+    saveStoresToDb(DEFAULT_INITIAL_STORES);
+    return DEFAULT_INITIAL_STORES;
+  }
   try {
     const raw = fs.readFileSync(DATA_FILE, 'utf-8');
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : DEFAULT_INITIAL_STORES;
   } catch (err) {
-    return [];
+    return DEFAULT_INITIAL_STORES;
   }
 }
 
@@ -120,13 +182,12 @@ app.post('/api/scrape', async (req, res) => {
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
         'Referer': 'https://www.openrice.com/'
       },
-      timeout: 6000
+      timeout: 5000
     });
 
     const $ = cheerio.load(response.data);
     const rawTitle = $('title').text().trim() || $('meta[property="og:title"]').attr('content') || fallbackInfo.title;
     const cleanTitle = cleanRestaurantName(rawTitle);
-
     const fullText = rawTitle + ' ' + url;
     const district = detectHkDistrict(fullText);
 
@@ -139,7 +200,7 @@ app.post('/api/scrape', async (req, res) => {
       id: `img-western-${Date.now()}-${i}`,
       url: img.url,
       caption: img.caption,
-      aiAltTag: `${district} ${cleanTitle} ${img.caption}`, // 🌟 避免重複店名！
+      aiAltTag: `${district} ${cleanTitle} ${img.caption}`,
       category: i % 2 === 0 ? 'dish' : 'env'
     }));
 
@@ -159,7 +220,7 @@ app.post('/api/scrape', async (req, res) => {
     const cleanTitle = cleanRestaurantName(fallbackInfo.title);
     const district = fallbackInfo.district;
 
-    const images = WESTERN_BAR_IMAGES.map((img, i) => ({
+    const fallbackImages = WESTERN_BAR_IMAGES.map((img, i) => ({
       id: `img-western-fb-${Date.now()}-${i}`,
       url: img.url,
       caption: img.caption,
@@ -175,7 +236,7 @@ app.post('/api/scrape', async (req, res) => {
         cuisine: fallbackInfo.cuisine,
         openriceUrl: url,
         metaDesc: '食材每日新鮮直送，全網高滿意度評價。',
-        images
+        images: fallbackImages
       }
     });
   }

@@ -30,7 +30,6 @@ export const NewStoreModal: React.FC<NewStoreModalProps> = ({
 
   if (!isOpen) return null;
 
-  // 貼上網址時，AI 即時自動解析全網頁並自動填滿所有表格欄位
   const handleAutoParseUrl = async (urlToParse?: string) => {
     const targetUrl = urlToParse || openriceUrl;
     if (!targetUrl || !targetUrl.startsWith('http')) return;
@@ -39,19 +38,17 @@ export const NewStoreModal: React.FC<NewStoreModalProps> = ({
     try {
       const scrapedData = await fetchLiveOpenRiceData(targetUrl);
       
-      const parsedTitle = scrapedData.title || '熱門精緻餐廳';
-      const parsedDist = scrapedData.district || '中環 Central';
-      const parsedCuis = scrapedData.cuisine || '異國料理 / 西式餐飲';
+      const parsedTitle = scrapedData.title || 'Library Restaurant and Bar';
+      const parsedDist = scrapedData.district || '尖沙咀 Tsim Sha Tsui';
+      const parsedCuis = scrapedData.cuisine || '西餐酒吧 / 精緻調酒';
 
       setName(parsedTitle);
       setDistrict(parsedDist);
       setCuisine(parsedCuis);
 
-      // 自動生成子網域 slug
       const slug = parsedTitle.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
-      setSubdomain(`${slug || 'store'}.georank.ai`);
+      setSubdomain(`${slug || 'store'}.studioconcierge.xyz`);
 
-      // 自動研擬 6 大衝頂關鍵字
       const autoKws = [
         `${parsedDist}${parsedCuis.split('/')[0]}推薦`,
         `${parsedDist}必食打卡`,
@@ -73,16 +70,15 @@ export const NewStoreModal: React.FC<NewStoreModalProps> = ({
     setName(val);
     if (!subdomain) {
       const slug = val.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
-      setSubdomain(`${slug || 'new-shop'}.georank.ai`);
+      setSubdomain(`${slug || 'new-shop'}.studioconcierge.xyz`);
     }
   };
 
-  // AI 手動自動研擬關鍵字
   const handleAiAutoKeywords = () => {
     setIsAiSuggestingKw(true);
     setTimeout(() => {
       const currentName = name || '熱門餐廳';
-      const currentDist = district || '中環';
+      const currentDist = district || '尖沙咀';
       const currentCuisine = cuisine.split('/')[0].trim() || '美食';
 
       const generatedKws = [
@@ -107,7 +103,6 @@ export const NewStoreModal: React.FC<NewStoreModalProps> = ({
     setBuildingStep(1);
     setLiveStatusMsg('正在發送真實 HTTP 請求至 OpenRice 網址爬取最新資料...');
 
-    // 真正執行真實抓取
     let scrapedInfo = await fetchLiveOpenRiceData(openriceUrl);
     
     const finalName = name || scrapedInfo.title;
@@ -141,7 +136,7 @@ export const NewStoreModal: React.FC<NewStoreModalProps> = ({
       district: finalDistrict,
       cuisine: finalCuisine,
       openriceUrl: openriceUrl,
-      subdomain: subdomain || `${finalName.toLowerCase().replace(/[^a-z0-9]/g, '-')}.georank.ai`,
+      subdomain: subdomain || `${finalName.toLowerCase().replace(/[^a-z0-9]/g, '-')}.studioconcierge.xyz`,
       customDomain: customDomain || undefined,
       status: 'active',
       targetKeywords: kwArray,
@@ -174,58 +169,8 @@ export const NewStoreModal: React.FC<NewStoreModalProps> = ({
 3. 支持線上預約，非常方便！`,
           schemaType: 'Restaurant & FAQPage Schema',
           keywords: kwArray,
-          aiSourcesCited: ['OpenRice 最新真實食評', '子網站自動生成'],
-          createdAt: '2026-07-23 10:50'
-        },
-        {
-          id: `art-cn-${Date.now()}`,
-          topic: '小紅書種草 & 避坑指南',
-          audience: 'cn',
-          title: `【香港自由行絕絕子】${finalDistrict}寶藏餐廳${finalName}！出片率100%必吃！`,
-          excerpt: `姐妹们冲就完事了！香港${finalDistrict}这家${finalName}真的太出片了！全预约制体验，内附保姆级订位避坑指南…`,
-          content: `姐妹们冲就完事了！香港${finalDistrict}这家【${finalName}】真的太出片了！
-
-每次来香港自由行必回购的宝藏${finalCuisine}！
-
-🌟 必点神仙单品：
-• 招牌极品美味：入口即化，鲜甜到掉眼泪！
-• 绝美拍照角落：夕阳黄昏时段拍照自带高光滤镜！
-
-💡 小贴士：支持微信/支付宝扫码点餐，记得提前预约！`,
-          schemaType: 'Restaurant & SocialPost Schema',
-          keywords: ['香港自由行必吃', `${finalDistrict}宝藏餐厅`, '小红书打卡'],
-          aiSourcesCited: ['小紅書爆款筆記', 'DeepSeek 知識庫'],
-          createdAt: '2026-07-23 10:50'
-        },
-        {
-          id: `art-tw-${Date.now()}`,
-          topic: '台味探店 & 口袋名單',
-          audience: 'tw',
-          title: `【香港美食探店】${finalDistrict}隱藏版美食「${finalName}」！在地內行人口袋名單大公開`,
-          excerpt: `去香港自由行不要只吃茶餐廳！這家位於${finalDistrict}的「${finalName}」是在地老饕大力推薦的口袋名單…`,
-          content: `去香港自由行不要只吃港點跟茶餐廳！這家位於${finalDistrict}的「${finalName}」是在地老饕大力推薦的私房口袋名單。
-
-🍣 內行人必嚐亮點：
-1. 熟成頂級食材：油脂分布勻稱，入口即化。
-2. 溫和貼心的台式親切服務：店員中文溝通完全無障礙！`,
-          schemaType: 'Restaurant & Article Schema',
-          keywords: ['香港美食探店', '口袋名單', `${finalDistrict}美食`],
-          aiSourcesCited: ['痞客邦 Travel', 'Kimi 全網檢索'],
-          createdAt: '2026-07-23 10:50'
-        },
-        {
-          id: `art-en-${Date.now()}`,
-          topic: 'Expat Luxury Guide',
-          audience: 'en',
-          title: `${finalDistrict} HK Dining Guide: ${finalName} Delivers Breathtaking Views & World-Class ${finalCuisine}`,
-          excerpt: `Looking for top-tier ${finalCuisine} in ${finalDistrict} Hong Kong? ${finalName} pairs market-fresh cuts with stunning ambiance...`,
-          content: `Looking for top-tier dining in ${finalDistrict} Hong Kong? 
-
-${finalName} pairs daily fresh cuts with panoramic city views. Located in ${finalDistrict}, this sanctuary offers an unforgettable tasting menu curated by veteran Executive Chefs. Fully English-speaking staff and online booking.`,
-          schemaType: 'Restaurant & TouristAttraction Schema',
-          keywords: [`${finalDistrict} Dining`, 'Expat Favorite', 'Luxury HK'],
-          aiSourcesCited: ['TripAdvisor Excellence', 'Perplexity Knowledge Graph'],
-          createdAt: '2026-07-23 10:50'
+          aiSourcesCited: ['OpenRice 最新真實食評', '子網站專屬頁面'],
+          createdAt: '2026-07-23 11:35'
         }
       ],
       scrapedImages: scrapedInfo.images.map((img, i) => ({
@@ -268,7 +213,6 @@ ${finalName} pairs daily fresh cuts with panoramic city views. Located in ${fina
     }}>
       <div className="glass-panel animate-fade-in" style={{ width: '100%', maxWidth: '600px', padding: '28px', position: 'relative' }}>
         
-        {/* Close Button */}
         <button
           onClick={onClose}
           style={{
@@ -289,7 +233,7 @@ ${finalName} pairs daily fresh cuts with panoramic city views. Located in ${fina
           真實 OpenRice 網址 AI 自動全頁提取與建站
         </h2>
         <p style={{ fontSize: '13px', color: '#9ca3af', marginBottom: '20px' }}>
-          只需貼上 OpenRice / 餐廳網址，點擊「⚡ AI 提取」，系統將<strong>自動填滿店名、地區、菜式、子網域與關鍵字</strong>！
+          只需貼上 OpenRice / 餐廳網址，點擊「⚡ AI 提取」，系統將自動填滿所有欄位與生成 <strong>studioconcierge.xyz</strong> 泛網域！
         </p>
 
         {isBuilding ? (
@@ -314,7 +258,6 @@ ${finalName} pairs daily fresh cuts with panoramic city views. Located in ${fina
         ) : (
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             
-            {/* OpenRice URL & Auto Parse Button */}
             <div>
               <label style={{ fontSize: '12px', fontWeight: '600', color: '#34d399', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '6px' }}>
                 <Globe size={14} /> OpenRice / 餐廳真實網址 *
@@ -365,7 +308,7 @@ ${finalName} pairs daily fresh cuts with panoramic city views. Located in ${fina
                 type="text"
                 value={name}
                 onChange={(e) => handleNameChange(e.target.value)}
-                placeholder="例如：鮨・天空 / 貼上網址自動填入"
+                placeholder="例如：Library Restaurant and Bar"
                 style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', background: '#111827', border: '1px solid #374151', color: '#f3f4f6', fontSize: '13px', outline: 'none' }}
               />
             </div>
@@ -379,7 +322,7 @@ ${finalName} pairs daily fresh cuts with panoramic city views. Located in ${fina
                   type="text"
                   value={district}
                   onChange={(e) => setDistrict(e.target.value)}
-                  placeholder="中環 / 銅鑼灣 / 灣仔"
+                  placeholder="尖沙咀 Tsim Sha Tsui"
                   style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', background: '#111827', border: '1px solid #374151', color: '#f3f4f6', fontSize: '13px', outline: 'none' }}
                 />
               </div>
@@ -392,7 +335,7 @@ ${finalName} pairs daily fresh cuts with panoramic city views. Located in ${fina
                   type="text"
                   value={cuisine}
                   onChange={(e) => setCuisine(e.target.value)}
-                  placeholder="日本菜 / 粵菜點心 / 西餐酒吧"
+                  placeholder="西餐酒吧 / 精緻調酒"
                   style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', background: '#111827', border: '1px solid #374151', color: '#f3f4f6', fontSize: '13px', outline: 'none' }}
                 />
               </div>
@@ -400,15 +343,15 @@ ${finalName} pairs daily fresh cuts with panoramic city views. Located in ${fina
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
               <div>
-                <label style={{ fontSize: '12px', fontWeight: '600', color: '#d1d5db', display: 'block', marginBottom: '4px' }}>
-                  自動生成子域名 (Subdomain)
+                <label style={{ fontSize: '12px', fontWeight: '600', color: '#34d399', display: 'block', marginBottom: '4px' }}>
+                  自動生成獨立子域名 (Subdomain)
                 </label>
                 <input
                   type="text"
                   value={subdomain}
                   onChange={(e) => setSubdomain(e.target.value)}
-                  placeholder="shopname.georank.ai"
-                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', background: '#111827', border: '1px solid #374151', color: '#60a5fa', fontSize: '13px', outline: 'none', fontFamily: 'var(--font-mono)' }}
+                  placeholder="shopname.studioconcierge.xyz"
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', background: '#111827', border: '1px solid #10b981', color: '#60a5fa', fontSize: '13px', outline: 'none', fontFamily: 'var(--font-mono)' }}
                 />
               </div>
 
@@ -426,7 +369,6 @@ ${finalName} pairs daily fresh cuts with panoramic city views. Located in ${fina
               </div>
             </div>
 
-            {/* AI Auto-Keywords Field & Magic Wand Button */}
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                 <label style={{ fontSize: '12px', fontWeight: '600', color: '#d1d5db' }}>
@@ -460,7 +402,7 @@ ${finalName} pairs daily fresh cuts with panoramic city views. Located in ${fina
                 type="text"
                 value={keywords}
                 onChange={(e) => setKeywords(e.target.value)}
-                placeholder="貼上網址自動帶出：[地區][菜式]推薦, [地區]必食, 小紅書打卡..."
+                placeholder="貼上網址自動帶出關鍵字..."
                 style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', background: '#111827', border: '1px solid #374151', color: '#f3f4f6', fontSize: '13px', outline: 'none' }}
               />
             </div>
@@ -480,7 +422,7 @@ ${finalName} pairs daily fresh cuts with panoramic city views. Located in ${fina
                 boxShadow: '0 4px 14px rgba(16, 185, 129, 0.4)'
               }}
             >
-              🚀 執行真實 HTTP 爬蟲並由 AI 一鍵建站與關鍵字衝頂
+              🚀 執行真實 HTTP 爬蟲並建立 *.studioconcierge.xyz 專屬子站
             </button>
 
           </form>
