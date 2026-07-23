@@ -10,91 +10,107 @@ import { AltTagEditorModal } from './components/AltTagEditorModal';
 import { INITIAL_STORES, INITIAL_TONE_RULES } from './mockData';
 import type { StoreItem, MarketAudience, TonePromptRule } from './types';
 
+const BACKEND_URL = 'http://localhost:3001';
+
 export function App() {
-  const [stores, setStores] = useState<StoreItem[]>(INITIAL_STORES);
-  const [toneRules, setToneRules] = useState<TonePromptRule[]>(INITIAL_TONE_RULES);
-  
   const [activeTab, setActiveTab] = useState<'report' | 'stores' | 'subsite' | 'probe'>('report');
   const [selectedAudience, setSelectedAudience] = useState<MarketAudience>('hk');
-  const [selectedStoreId, setSelectedStoreId] = useState<string>(INITIAL_STORES[0]?.id || '');
+  
+  const [stores, setStores] = useState<StoreItem[]>(INITIAL_STORES);
+  const [selectedStoreId, setSelectedStoreId] = useState<string>(INITIAL_STORES[0]?.id || 'store-1');
+  const [selectedAltStore, setSelectedAltStore] = useState<StoreItem>(INITIAL_STORES[0]);
+  
+  const [toneRules, setToneRules] = useState<TonePromptRule[]>(INITIAL_TONE_RULES);
 
-  // Modals state
   const [isNewStoreModalOpen, setIsNewStoreModalOpen] = useState<boolean>(false);
   const [isPromptModalOpen, setIsPromptModalOpen] = useState<boolean>(false);
-  const [editingAltStore, setEditingAltStore] = useState<StoreItem | null>(null);
+  const [isAltTagModalOpen, setIsAltTagModalOpen] = useState<boolean>(false);
 
-  // 🌟 從實體後端資料庫載入最新持久化商戶清單 (避免重新整理網頁時復原)
+  // 當使用者造訪泛子網域 (例如 library-restaurant-and-bar.studioconcierge.xyz) 時，自動辨識並進入專屬子頁面
   useEffect(() => {
-    fetch('http://localhost:3001/api/stores')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success && Array.isArray(data.stores) && data.stores.length > 0) {
-          setStores(data.stores);
-          setSelectedStoreId(data.stores[0].id);
+    const hostname = window.location.hostname;
+    if (hostname.includes('.studioconcierge.xyz') && !hostname.startsWith('www.')) {
+      const subPrefix = hostname.split('.')[0];
+      const matchedStore = stores.find(s => s.subdomain.startsWith(subPrefix));
+      if (matchedStore) {
+        setSelectedStoreId(matchedStore.id);
+        setActiveTab('subsite');
+      }
+    }
+  }, [stores]);
+
+  useEffect(() => {
+    const fetchStoresFromBackend = async () => {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/stores`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && Array.isArray(data.stores) && data.stores.length > 0) {
+            setStores(data.stores);
+            if (!selectedStoreId) {
+              setSelectedStoreId(data.stores[0].id);
+            }
+          }
         }
-      })
-      .catch(err => {
-        console.warn('[App Persistence] 使用預設商戶清單:', err);
-      });
+      } catch (err) {
+        console.log('[App Sync] 後端未啟動，使用本地備用數據:', err);
+      }
+    };
+    fetchStoresFromBackend();
   }, []);
 
   const handleAddStore = async (newStore: StoreItem) => {
     setStores(prev => [newStore, ...prev]);
     setSelectedStoreId(newStore.id);
-    setActiveTab('subsite');
 
-    // 實體同步寫入後端資料庫
     try {
-      await fetch('http://localhost:3001/api/stores', {
+      await fetch(`${BACKEND_URL}/api/stores`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newStore)
       });
     } catch (err) {
-      console.warn('Backend POST Store Error:', err);
+      console.warn('[DB Save Warning] 儲存至持久 DB 失敗:', err);
     }
   };
 
   const handleDeleteStore = async (storeId: string) => {
-    // 1. 即時更新前端狀態
-    const updated = stores.filter(s => s.id !== storeId);
-    setStores(updated);
-    if (selectedStoreId === storeId && updated.length > 0) {
-      setSelectedStoreId(updated[0].id);
-    }
+    setStores(prev => {
+      const updated = prev.filter(s => s.id !== storeId);
+      if (selectedStoreId === storeId && updated.length > 0) {
+        setSelectedStoreId(updated[0].id);
+      }
+      return updated;
+    });
 
-    // 2. 實體發送 DELETE 請求至 Node.js 後端伺服器 (寫入 stores_db.json)
     try {
-      await fetch(`http://localhost:3001/api/stores/${storeId}`, { method: 'DELETE' });
+      await fetch(`${BACKEND_URL}/api/stores/${storeId}`, {
+        method: 'DELETE'
+      });
     } catch (err) {
-      console.warn('Backend DELETE API Error:', err);
+      console.warn('[DB Delete Warning] 從持久 DB 刪除失敗:', err);
     }
   };
 
-  const handleSelectStoreForPreview = (storeId: string) => {
-    setSelectedStoreId(storeId);
-    setActiveTab('subsite');
+  const handleUpdateToneRules = (updatedRules: TonePromptRule[]) => {
+    setToneRules(updatedRules);
   };
 
-  const handleUpdateImageAlt = (imageId: string, newAlt: string) => {
+  const handleUpdateAltTag = (imageId: string, newAltTag: string) => {
     setStores(prev => prev.map(s => {
-      if (editingAltStore && s.id === editingAltStore.id) {
-        const updatedImgs = s.scrapedImages.map(img => {
-          if (img.id === imageId) {
-            return { ...img, aiAltTag: newAlt };
-          }
-          return img;
-        });
-        return { ...s, scrapedImages: updatedImgs };
+      if (s.id === selectedStoreId) {
+        return {
+          ...s,
+          scrapedImages: s.scrapedImages.map(img => img.id === imageId ? { ...img, aiAltTag: newAltTag } : img)
+        };
       }
       return s;
     }));
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-primary)' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg-main)', color: '#f3f4f6' }}>
       
-      {/* Top Header */}
       <Header
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -105,23 +121,21 @@ export function App() {
         storeCount={stores.length}
       />
 
-      {/* Main Content Area */}
-      <main style={{ flex: 1, padding: '0 28px 40px', maxWidth: '1400px', width: '100%', margin: '0 auto' }}>
-        
+      <main style={{ maxWidth: '1440px', margin: '0 auto', padding: '24px' }}>
         {activeTab === 'report' && (
           <DailyReportTab
             stores={stores}
-            onSelectStoreForPreview={handleSelectStoreForPreview}
+            onSelectStoreForPreview={(id) => { setSelectedStoreId(id); setActiveTab('subsite'); }}
           />
         )}
 
         {activeTab === 'stores' && (
           <StoreManagementTab
             stores={stores}
-            onOpenNewStoreModal={() => setIsNewStoreModalOpen(true)}
-            onSelectStoreForPreview={handleSelectStoreForPreview}
-            onOpenAltEditor={(store) => setEditingAltStore(store)}
             onDeleteStore={handleDeleteStore}
+            onOpenNewStoreModal={() => setIsNewStoreModalOpen(true)}
+            onSelectStoreForPreview={(id) => { setSelectedStoreId(id); setActiveTab('subsite'); }}
+            onOpenAltEditor={(store) => { setSelectedAltStore(store); setIsAltTagModalOpen(true); }}
           />
         )}
 
@@ -136,42 +150,31 @@ export function App() {
         )}
 
         {activeTab === 'probe' && (
-          <AiProbeSimulatorTab stores={stores} />
+          <AiProbeSimulatorTab
+            stores={stores}
+          />
         )}
-
       </main>
 
-      {/* Footer */}
-      <footer style={{ borderTop: '1px solid rgba(255, 255, 255, 0.08)', padding: '20px 28px', textAlign: 'center', fontSize: '12px', color: '#6b7280' }}>
-        <p>
-          GeoRank AI 智搜霸主 • 6-12個月目標衝頂自動化系統 © 2026 全權所有
-        </p>
-      </footer>
-
-      {/* New Store Creation Modal */}
       <NewStoreModal
         isOpen={isNewStoreModalOpen}
         onClose={() => setIsNewStoreModalOpen(false)}
         onAddStore={handleAddStore}
       />
 
-      {/* AI Prompt Customizer Modal */}
       <PromptCustomizerModal
         isOpen={isPromptModalOpen}
         onClose={() => setIsPromptModalOpen(false)}
         rules={toneRules}
-        onSaveRules={(updated) => setToneRules(updated)}
+        onSaveRules={handleUpdateToneRules}
       />
 
-      {/* Image Alt Tag Editor Modal */}
-      {editingAltStore && (
-        <AltTagEditorModal
-          isOpen={!!editingAltStore}
-          onClose={() => setEditingAltStore(null)}
-          store={editingAltStore}
-          onUpdateImageAlt={handleUpdateImageAlt}
-        />
-      )}
+      <AltTagEditorModal
+        isOpen={isAltTagModalOpen}
+        onClose={() => setIsAltTagModalOpen(false)}
+        store={selectedAltStore}
+        onUpdateImageAlt={handleUpdateAltTag}
+      />
 
     </div>
   );
