@@ -338,7 +338,7 @@ export const AiProbeSimulatorTab: React.FC<AiProbeSimulatorTabProps> = ({ stores
 
               <span style={{ fontSize: '12px', background: 'rgba(16, 185, 129, 0.15)', color: '#34d399', padding: '3px 10px', borderRadius: '20px', border: '1px solid rgba(16, 185, 129, 0.3)', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: '700' }}>
                 <Wifi size={12} />
-                🟢 100% 真實即時 API 連線測試 (Live Verified)
+                🟢 免設定 API Key • 系統中央代理自動實測 (Zero Setup Required)
               </span>
             </div>
             <p style={{ fontSize: '13px', color: '#9ca3af', marginTop: '4px' }}>
