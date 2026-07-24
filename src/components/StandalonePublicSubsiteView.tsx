@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import type { StoreItem } from '../types';
-import { ExternalLink, MapPin, Utensils, Calendar, Heart, RefreshCw } from 'lucide-react';
+import { ExternalLink, MapPin, Utensils, Calendar, Heart, RefreshCw, BookOpen, Clock } from 'lucide-react';
 
 interface StandalonePublicSubsiteViewProps {
   store: StoreItem;
@@ -12,7 +12,14 @@ export const StandalonePublicSubsiteView: React.FC<StandalonePublicSubsiteViewPr
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [rotationOffset, setRotationOffset] = useState<number>(0);
 
-  const currentArticle = store.articles.find(a => a.audience === activeLang) || store.articles[0];
+  // 📚 獲取選定語言的所有歷史每日文章存檔 (按發佈時間倒序)
+  const langArticles = useMemo(() => {
+    if (!store.articles || store.articles.length === 0) return [];
+    return store.articles.filter(a => a.audience === activeLang);
+  }, [store.articles, activeLang]);
+
+  const latestArticle = langArticles[0] || store.articles[0];
+  const historyArticles = langArticles.slice(1);
 
   // 🔄 每日自動依據日期 (Date Seed) 輪播照片排序
   const rotatedImages = useMemo(() => {
@@ -144,7 +151,7 @@ export const StandalonePublicSubsiteView: React.FC<StandalonePublicSubsiteViewPr
         </div>
       </header>
 
-      {/* Hero Banner Section (Dynamically rotated based on daily seed) */}
+      {/* Hero Banner Section */}
       <section style={{ position: 'relative', height: '380px', overflow: 'hidden', background: '#111827' }}>
         <img
           src={rotatedImages[0]?.url || "https://static7.orstatic.com/userphoto2/photo/1R/1E35/09W6HYF78C0542CE2C17F5lx.jpg"}
@@ -219,7 +226,7 @@ export const StandalonePublicSubsiteView: React.FC<StandalonePublicSubsiteViewPr
       </section>
 
       {/* Main Content Body */}
-      <main style={{ maxWidth: '1200px', margin: '0 auto', padding: '36px 24px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
+      <main style={{ maxWidth: '1200px', margin: '0 auto', padding: '36px 24px', display: 'flex', flexDirection: 'column', gap: '36px' }}>
         
         {/* Photo Gallery (Daily Rotated) */}
         <section>
@@ -246,17 +253,66 @@ export const StandalonePublicSubsiteView: React.FC<StandalonePublicSubsiteViewPr
           </div>
         </section>
 
-        {/* Featured Article Section */}
-        {currentArticle && (
+        {/* 🌟 最新每日 AI 文章 (Featured Daily Article - Day 2) */}
+        {latestArticle && (
           <section style={{ background: '#111827', padding: '28px', borderRadius: '16px', border: '1px solid #1f293d' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <span style={{ fontSize: '12px', background: 'rgba(59, 130, 246, 0.2)', color: '#60a5fa', padding: '4px 12px', borderRadius: '6px', fontWeight: '700', border: '1px solid rgba(59, 130, 246, 0.4)' }}>
+                🔥 最新每日精選文章：{latestArticle.topic}
+              </span>
+              <span style={{ fontSize: '12px', color: '#9ca3af', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <Clock size={14} /> 發佈時間: {latestArticle.createdAt}
+              </span>
+            </div>
+
             <h2 style={{ fontSize: '22px', fontWeight: '900', color: '#fff', marginBottom: '12px', lineHeight: '1.4' }}>
-              {currentArticle.title}
+              {latestArticle.title}
             </h2>
             <p style={{ fontSize: '14px', color: '#9ca3af', lineHeight: '1.6', background: 'rgba(255,255,255,0.02)', padding: '14px 18px', borderRadius: '10px', borderLeft: '4px solid #3b82f6', marginBottom: '20px' }}>
-              {currentArticle.excerpt}
+              {latestArticle.excerpt}
             </p>
             <div style={{ fontSize: '15px', color: '#e5e7eb', lineHeight: '1.8', whiteSpace: 'pre-line' }}>
-              {currentArticle.content}
+              {latestArticle.content}
+            </div>
+          </section>
+        )}
+
+        {/* 📚 歷史每日 AI 文章動態存檔列表 (Daily Article Timeline Archive Flow) */}
+        {historyArticles.length > 0 && (
+          <section style={{ background: '#0e1422', padding: '28px', borderRadius: '16px', border: '1px solid #1f293d' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h2 style={{ fontSize: '18px', fontWeight: '800', color: '#fff', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <BookOpen size={20} color="#fbbf24" />
+                📚 歷史每日 AI 文章動態發佈存檔 (共 {langArticles.length} 篇每日累積)
+              </h2>
+              <span style={{ fontSize: '12px', color: '#fbbf24', fontWeight: '600' }}>
+                每日 03:00 AM 自動持續累積
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              {historyArticles.map((art, index) => (
+                <div key={art.id || index} style={{ background: '#111827', padding: '22px', borderRadius: '12px', border: '1px solid #1f293d' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                    <span style={{ fontSize: '12px', background: 'rgba(251, 191, 36, 0.15)', color: '#fbbf24', padding: '3px 10px', borderRadius: '6px', fontWeight: '700' }}>
+                      歷史文章：{art.topic}
+                    </span>
+                    <span style={{ fontSize: '12px', color: '#9ca3af', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Clock size={13} /> {art.createdAt}
+                    </span>
+                  </div>
+
+                  <h3 style={{ fontSize: '18px', fontWeight: '800', color: '#f3f4f6', marginBottom: '10px' }}>
+                    {art.title}
+                  </h3>
+                  <p style={{ fontSize: '13px', color: '#9ca3af', lineHeight: '1.6', marginBottom: '14px' }}>
+                    {art.excerpt}
+                  </p>
+                  <div style={{ fontSize: '14px', color: '#d1d5db', lineHeight: '1.7', whiteSpace: 'pre-line' }}>
+                    {art.content}
+                  </div>
+                </div>
+              ))}
             </div>
           </section>
         )}
